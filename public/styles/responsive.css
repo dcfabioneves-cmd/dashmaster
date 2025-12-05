@@ -1,0 +1,903 @@
+/* ===== RESPONSIVE STYLES ===== */
+
+/* Extra large screens (1440px and up) */
+@media (min-width: 1440px) {
+    .header-container,
+    .nav-container,
+    .dashboard-container,
+    .footer-container {
+        max-width: 1600px;
+    }
+    
+    .charts-grid {
+        grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+    }
+    
+    .insights-grid {
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    }
+}
+
+/* Large screens (1200px to 1439px) */
+@media (max-width: 1439px) {
+    .header-container,
+    .nav-container,
+    .dashboard-container,
+    .footer-container {
+        max-width: 1200px;
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+    
+    .charts-grid {
+        grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    }
+}
+
+/* Tablets and small laptops (992px to 1199px) */
+@media (max-width: 1199px) {
+    .header-container,
+    .nav-container,
+    .dashboard-container {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+    
+    .logo {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+    }
+    
+    .site-title h1 {
+        font-size: 1.3rem;
+    }
+    
+    .site-title p {
+        font-size: 0.85rem;
+    }
+    
+    .nav-container {
+        flex-direction: column;
+        gap: 15px;
+        align-items: stretch;
+    }
+    
+    .nav-controls {
+        justify-content: space-between;
+    }
+    
+    .charts-grid {
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    }
+    
+    .insights-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .kpi-cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .dashboard-container {
+        padding: 20px 15px;
+    }
+}
+
+/* Tablets (768px to 991px) */
+@media (max-width: 991px) {
+    .header-container {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+        padding: 15px;
+    }
+    
+    .logo-container {
+        justify-content: center;
+    }
+    
+    .user-menu {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .header-controls {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+    }
+    
+    .control-group {
+        border-right: none;
+        padding-right: 0;
+    }
+    
+    .nav-menu {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .kpi-cards {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+    
+    .filter-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+    }
+    
+    .filter-group {
+        min-width: auto;
+    }
+    
+    .filter-actions {
+        justify-content: center;
+        margin-top: 10px;
+    }
+    
+    .insights-header-main {
+        flex-direction: column;
+        gap: 20px;
+        align-items: stretch;
+        text-align: center;
+    }
+    
+    .insights-title-group {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .insights-actions {
+        justify-content: center;
+    }
+    
+    .dashboard-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: stretch;
+        text-align: center;
+    }
+    
+    .dashboard-controls {
+        justify-content: center;
+    }
+    
+    .status-bar {
+        flex-direction: column;
+        gap: 15px;
+        align-items: stretch;
+    }
+    
+    .status-item {
+        justify-content: center;
+    }
+    
+    .footer-content {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 30px;
+    }
+    
+    .footer-bottom {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+}
+
+/* Mobile phones (576px to 767px) */
+@media (max-width: 767px) {
+    .header-container {
+        padding: 10px;
+    }
+    
+    .logo {
+        width: 45px;
+        height: 45px;
+        font-size: 1.3rem;
+    }
+    
+    .site-title h1 {
+        font-size: 1.2rem;
+    }
+    
+    .theme-toggle,
+    .back-btn {
+        padding: 8px 12px;
+        font-size: 0.85rem;
+    }
+    
+    .theme-toggle .theme-text,
+    .back-btn span {
+        display: none;
+    }
+    
+    .theme-toggle .theme-icon,
+    .back-btn i {
+        margin: 0;
+    }
+    
+    .nav-menu a {
+        padding: 10px 15px;
+        font-size: 0.9rem;
+    }
+    
+    .nav-menu a i {
+        font-size: 1rem;
+    }
+    
+    .preset-filters {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .date-range-display {
+        min-width: auto;
+        font-size: 0.8rem;
+        padding: 6px 10px;
+    }
+    
+    .dashboard-container {
+        padding: 15px 10px;
+    }
+    
+    .filters {
+        padding: 20px 15px;
+    }
+    
+    .filter-header h3 {
+        font-size: 1.1rem;
+    }
+    
+    .kpi-cards {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .kpi-card {
+        padding: 20px;
+    }
+    
+    .kpi-value {
+        font-size: 1.8rem;
+    }
+    
+    .chart-container {
+        padding: 20px 15px;
+    }
+    
+    .chart-title {
+        font-size: 1.1rem;
+    }
+    
+    .chart-wrapper {
+        height: 250px;
+    }
+    
+    .insights-grid {
+        gap: 15px;
+    }
+    
+    .insight-card {
+        padding: 15px;
+    }
+    
+    .insight-header {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
+    
+    .insight-priority {
+        align-self: flex-start;
+    }
+    
+    .insight-footer {
+        flex-direction: column;
+        gap: 15px;
+        align-items: stretch;
+    }
+    
+    .insight-meta {
+        justify-content: space-between;
+    }
+    
+    .insight-action {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .insights-summary {
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+    }
+    
+    .summary-item {
+        width: 100%;
+        max-width: 250px;
+        justify-content: center;
+    }
+    
+    .footer-content {
+        grid-template-columns: 1fr;
+        gap: 25px;
+    }
+    
+    .footer-section {
+        text-align: center;
+    }
+    
+    .footer-buttons,
+    .share-buttons,
+    .presentation-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .footer-btn,
+    .share-btn {
+        width: 100%;
+        max-width: 300px;
+        justify-content: center;
+    }
+    
+    .table-container {
+        font-size: 0.85rem;
+    }
+    
+    #data-table th,
+    #data-table td {
+        padding: 10px 12px;
+    }
+    
+    .modal-content {
+        width: 95%;
+        margin: 10px;
+    }
+}
+
+/* Small mobile phones (up to 575px) */
+@media (max-width: 575px) {
+    .auth-card {
+        padding: 25px 20px;
+    }
+    
+    .header-container {
+        padding: 8px;
+    }
+    
+    .logo {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+    }
+    
+    .site-title h1 {
+        font-size: 1.1rem;
+    }
+    
+    .site-title p {
+        font-size: 0.8rem;
+    }
+    
+    .nav-container {
+        padding: 10px;
+    }
+    
+    .nav-menu {
+        justify-content: flex-start;
+        padding: 5px 0;
+    }
+    
+    .nav-menu a {
+        padding: 8px 12px;
+        font-size: 0.85rem;
+    }
+    
+    .nav-menu a i {
+        font-size: 0.9rem;
+    }
+    
+    .preset-btn {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+    }
+    
+    .preset-btn i {
+        font-size: 0.8rem;
+    }
+    
+    .date-range-display {
+        font-size: 0.75rem;
+        padding: 5px 8px;
+    }
+    
+    .dashboard-container {
+        padding: 10px 8px;
+    }
+    
+    .filters {
+        padding: 15px 12px;
+    }
+    
+    .filter-group label {
+        font-size: 0.85rem;
+    }
+    
+    .date-input,
+    .select-input {
+        padding: 10px 14px;
+        font-size: 0.9rem;
+    }
+    
+    .filter-btn {
+        padding: 10px 15px;
+        font-size: 0.9rem;
+    }
+    
+    .kpi-card {
+        padding: 15px;
+    }
+    
+    .kpi-title {
+        font-size: 0.9rem;
+    }
+    
+    .kpi-value {
+        font-size: 1.6rem;
+    }
+    
+    .kpi-description {
+        font-size: 0.8rem;
+    }
+    
+    .chart-container {
+        padding: 15px 12px;
+    }
+    
+    .chart-title {
+        font-size: 1rem;
+    }
+    
+    .chart-control {
+        width: 32px;
+        height: 32px;
+        font-size: 0.9rem;
+    }
+    
+    .chart-wrapper {
+        height: 200px;
+    }
+    
+    .chart-stats {
+        flex-direction: column;
+        gap: 8px;
+        align-items: center;
+    }
+    
+    .insights-section {
+        padding: 20px 15px;
+    }
+    
+    .ai-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+    }
+    
+    .insights-title-group h3 {
+        font-size: 1.3rem;
+    }
+    
+    .insights-title-group p {
+        font-size: 0.9rem;
+    }
+    
+    .insight-btn {
+        padding: 8px 15px;
+        font-size: 0.85rem;
+    }
+    
+    .insight-card {
+        padding: 12px;
+    }
+    
+    .insight-message {
+        font-size: 0.95rem;
+    }
+    
+    .insight-advice {
+        font-size: 0.85rem;
+    }
+    
+    .insight-actions {
+        padding: 12px;
+    }
+    
+    .insight-actions h5 {
+        font-size: 0.85rem;
+    }
+    
+    .insight-actions li {
+        font-size: 0.8rem;
+    }
+    
+    .meta-item {
+        font-size: 0.75rem;
+    }
+    
+    .insight-action {
+        font-size: 0.8rem;
+        padding: 6px 12px;
+    }
+    
+    .summary-item {
+        padding: 8px 15px;
+        font-size: 0.9rem;
+    }
+    
+    .table-header {
+        padding: 15px;
+        flex-direction: column;
+        gap: 15px;
+        align-items: stretch;
+        text-align: center;
+    }
+    
+    .table-action {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    #data-table th,
+    #data-table td {
+        padding: 8px 10px;
+        font-size: 0.8rem;
+    }
+    
+    .modal-content {
+        margin: 5px;
+        padding: 15px;
+    }
+    
+    .modal-header {
+        padding: 15px;
+    }
+    
+    .modal-title {
+        font-size: 1.2rem;
+    }
+    
+    .modal-body {
+        padding: 15px;
+    }
+    
+    .modal-footer {
+        padding: 15px;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .modal-btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .notification {
+        max-width: 300px;
+        padding: 12px 15px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Very small screens (up to 360px) */
+@media (max-width: 360px) {
+    .auth-card {
+        padding: 20px 15px;
+    }
+    
+    .auth-logo {
+        font-size: 2rem;
+    }
+    
+    .auth-title {
+        font-size: 1.5rem;
+    }
+    
+    .header-container {
+        padding: 5px;
+    }
+    
+    .logo {
+        width: 35px;
+        height: 35px;
+        font-size: 1.1rem;
+    }
+    
+    .site-title h1 {
+        font-size: 1rem;
+    }
+    
+    .control-btn {
+        width: 35px;
+        height: 35px;
+        font-size: 1rem;
+    }
+    
+    .nav-menu a {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+    }
+    
+    .nav-menu a i {
+        font-size: 0.85rem;
+    }
+    
+    .preset-btn {
+        padding: 5px 10px;
+        font-size: 0.75rem;
+    }
+    
+    .kpi-card {
+        padding: 12px;
+    }
+    
+    .kpi-value {
+        font-size: 1.4rem;
+    }
+    
+    .chart-container {
+        padding: 12px 10px;
+    }
+    
+    .chart-title {
+        font-size: 0.95rem;
+    }
+    
+    .chart-wrapper {
+        height: 180px;
+    }
+    
+    .insights-grid {
+        gap: 12px;
+    }
+    
+    .insight-card {
+        padding: 10px;
+    }
+    
+    .insight-message {
+        font-size: 0.9rem;
+    }
+    
+    .footer-btn,
+    .share-btn {
+        padding: 10px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Landscape orientation for mobile */
+@media (max-height: 600px) and (orientation: landscape) {
+    .auth-container {
+        padding: 10px;
+    }
+    
+    .auth-card {
+        max-width: 90%;
+        padding: 20px;
+    }
+    
+    .auth-header {
+        margin-bottom: 20px;
+    }
+    
+    .auth-form {
+        gap: 15px;
+    }
+    
+    .form-group input {
+        padding: 12px 16px;
+    }
+    
+    .auth-btn {
+        padding: 12px;
+    }
+    
+    .dashboard-container {
+        padding: 15px;
+    }
+    
+    .chart-wrapper {
+        height: 200px;
+    }
+    
+    .kpi-cards {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+}
+
+/* High DPI screens */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .logo,
+    .ai-icon,
+    .insight-icon,
+    .chart-control,
+    .kpi-action,
+    .control-btn {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+}
+
+/* Print styles */
+@media print {
+    .header-controls,
+    .nav-controls,
+    .no-print,
+    .filter-actions,
+    .dashboard-controls,
+    .insights-actions,
+    .chart-controls,
+    .insight-action,
+    .table-action,
+    .footer-buttons,
+    .share-buttons,
+    .presentation-buttons {
+        display: none !important;
+    }
+    
+    body {
+        font-size: 12pt;
+        line-height: 1.5;
+    }
+    
+    .auth-container,
+    .project-manager,
+    #dashboard-header,
+    #dashboard-nav,
+    #dashboard-footer {
+        display: none !important;
+    }
+    
+    .dashboard-container {
+        padding: 0;
+        margin: 0;
+        min-height: auto;
+    }
+    
+    .container {
+        display: block !important;
+        padding: 0;
+        max-width: none;
+    }
+    
+    .kpi-card,
+    .chart-container,
+    .insight-card,
+    .data-table-section,
+    .filters {
+        break-inside: avoid;
+        box-shadow: none !important;
+        border: 1px solid #ddd !important;
+        margin-bottom: 20px;
+    }
+    
+    .kpi-cards,
+    .charts-grid,
+    .insights-grid {
+        display: block;
+    }
+    
+    .kpi-card,
+    .chart-container,
+    .insight-card {
+        margin-bottom: 20px;
+        page-break-inside: avoid;
+    }
+    
+    .chart-wrapper canvas {
+        max-width: 100% !important;
+        height: auto !important;
+    }
+    
+    #data-table {
+        font-size: 10pt;
+    }
+    
+    @page {
+        margin: 2cm;
+    }
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+    
+    .auth-card,
+    .kpi-card,
+    .chart-container,
+    .insight-card {
+        transition: none !important;
+    }
+}
+
+/* Dark mode preference (system level) */
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme]) {
+        --bg-primary: #202124;
+        --bg-secondary: #292a2d;
+        --text-primary: #e8eaed;
+        --text-secondary: #9aa0a6;
+        --border-color: #5f6368;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .control-btn,
+    .theme-toggle,
+    .back-btn,
+    .nav-menu a,
+    .preset-btn,
+    .filter-btn,
+    .kpi-action,
+    .insight-btn,
+    .chart-control,
+    .insight-action,
+    .table-action,
+    .footer-btn,
+    .share-btn,
+    .modal-btn {
+        min-height: 44px;
+        min-width: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .form-group input,
+    .form-group select,
+    .date-input,
+    .select-input {
+        font-size: 16px; /* Prevents iOS zoom */
+    }
+    
+    .chart-container {
+        padding: 20px;
+    }
+    
+    .kpi-card,
+    .insight-card {
+        padding: 20px;
+    }
+    
+    /* Increase tap targets for mobile */
+    .nav-menu a {
+        padding: 15px 20px;
+    }
+    
+    .preset-btn {
+        padding: 12px 20px;
+    }
+    
+    .filter-btn {
+        padding: 15px 25px;
+    }
+}

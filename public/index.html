@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DashMaster - Dashboard de Marketing</title>
+    
+    <!-- Ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- CSS do DashMaster -->
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/auth.css">
+    <link rel="stylesheet" href="styles/dashboard.css">
+    <link rel="stylesheet" href="styles/responsive.css">
+</head>
+<body>
+    <!-- Auth Screens -->
+    <div id="auth-container" class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="auth-logo">📊 DashMaster</div>
+                <h1 class="auth-title" id="auth-title">Acesse sua conta</h1>
+                <p class="auth-subtitle" id="auth-subtitle">Entre para gerenciar seus dashboards</p>
+            </div>
+            <form id="auth-form" class="auth-form">
+                <div class="form-group" id="name-field" style="display: none;">
+                    <label for="name">Nome completo</label>
+                    <input type="text" id="name" data-required="true" 
+                           oninvalid="this.setCustomValidity('Por favor, preencha este campo')" 
+                           oninput="this.setCustomValidity('')">
+                </div>
+                <div class="form-group">
+                    <label for="email">E-mail</label>
+                    <input type="email" id="email" required 
+                           oninvalid="this.setCustomValidity('Por favor, insira um e-mail válido')" 
+                           oninput="this.setCustomValidity('')">
+                </div>
+                <div class="form-group">
+                    <label for="password">Senha</label>
+                    <input type="password" id="password" required 
+                           oninvalid="this.setCustomValidity('Por favor, insira sua senha')" 
+                           oninput="this.setCustomValidity('')">
+                </div>
+                <div class="form-group" id="confirm-password-field" style="display: none;">
+                    <label for="confirm-password">Confirmar senha</label>
+                    <input type="password" id="confirm-password" 
+                           oninvalid="this.setCustomValidity('As senhas não coincidem')" 
+                           oninput="this.setCustomValidity('')">
+                </div>
+                <button type="submit" class="auth-btn" id="auth-submit">Entrar</button>
+            </form>
+            <div class="auth-footer">
+                <span id="auth-switch-text">Não tem uma conta?</span>
+                <a href="#" class="auth-link" id="auth-switch">Cadastre-se</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Project Manager -->
+    <div id="project-manager" class="project-manager" style="display: none;">
+        <div class="project-manager-container">
+            <div class="project-header">
+                <div class="project-logo">📊 DashMaster</div>
+                <h1>Seus Projetos</h1>
+                <p>Gerencie seus dashboards de marketing</p>
+                <div class="user-info">
+                    <span id="user-name">Usuário</span>
+                    <button onclick="window.authManager && window.authManager.logout()" class="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i> Sair
+                    </button>
+                </div>
+            </div>
+            <div class="projects-grid" id="projects-grid">
+                <!-- Projects will be loaded here dynamically -->
+                <div class="empty-projects">
+                    <i class="fas fa-folder-open"></i>
+                    <h3>Nenhum projeto encontrado</h3>
+                    <p>Crie seu primeiro projeto para começar</p>
+                    <button onclick="window.createNewProject && createNewProject()" id="empty-new-project" class="btn btn-primary mt-3">
+                        <i class="fas fa-plus"></i> Criar Primeiro Projeto
+                    </button>
+                </div>
+            </div>
+            <div class="project-actions">
+                <button onclick="window.createNewProject && createNewProject()" id="new-project-btn" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Novo Projeto
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Novo Projeto -->
+    <div id="new-project-modal" class="modal" style="display: none;">
+        <div class="modal-content animate__animated animate__zoomIn">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fas fa-plus-circle"></i> Novo Projeto</h3>
+                <button id="close-new-project" class="close-btn"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="project-name">Nome do Projeto</label>
+                    <input type="text" id="project-name" placeholder="Ex: Dashboard Cliente X">
+                </div>
+                
+                <div class="form-group url-input-group">
+                    <label for="spreadsheet-url">URL da Planilha Google Sheets</label>
+                    <div class="input-with-btn">
+                        <input type="text" id="spreadsheet-url" placeholder="https://docs.google.com/spreadsheets/d/...">
+                        <button id="validate-url" class="btn btn-secondary" title="Validar URL">
+                            <i class="fas fa-check"></i>
+                        </button>
+                    </div>
+                    <small class="text-muted">A planilha deve estar pública ou compartilhada.</small>
+                </div>
+                
+                <div class="form-group">
+                    <label>Categorias de KPI</label>
+                    <div class="categories-grid">
+                        <label class="category-option">
+                            <input type="checkbox" class="category-checkbox" value="email">
+                            <span class="cat-card"><i class="fas fa-envelope"></i> E-mail</span>
+                        </label>
+                        <label class="category-option">
+                            <input type="checkbox" class="category-checkbox" value="social">
+                            <span class="cat-card"><i class="fas fa-share-alt"></i> Social</span>
+                        </label>
+                        <label class="category-option">
+                            <input type="checkbox" class="category-checkbox" value="google-ads">
+                            <span class="cat-card"><i class="fab fa-google"></i> Google Ads</span>
+                        </label>
+                        <label class="category-option">
+                            <input type="checkbox" class="category-checkbox" value="meta-ads">
+                            <span class="cat-card"><i class="fab fa-facebook"></i> Meta Ads</span>
+                        </label>
+                        <label class="category-option">
+                            <input type="checkbox" class="category-checkbox" value="seo">
+                            <span class="cat-card"><i class="fas fa-search"></i> SEO</span>
+                        </label>
+                        <label class="category-option">
+                            <input type="checkbox" class="category-checkbox" value="ecommerce">
+                            <span class="cat-card"><i class="fas fa-shopping-cart"></i> E-commerce</span>
+                        </label>
+                        <label class="category-option">
+                            <input type="checkbox" class="category-checkbox" value="blog">
+                            <span class="cat-card"><i class="fas fa-blog"></i> Blog</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group options-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="auto-refresh" checked>
+                        Atualização automática (5 min)
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="email-reports">
+                        Receber relatórios semanais
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="cancel-new-project" class="btn btn-secondary modal-btn">Cancelar</button>
+                <button id="create-project" class="btn btn-primary modal-btn">Criar Projeto</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Dashboard -->
+    <header id="dashboard-header" style="display: none;">
+        <div class="dashboard-toolbar">
+            <div class="toolbar-left">
+                <div class="logo">📊 DashMaster</div>
+                <div class="project-info">
+                    <h2 id="project-title">Dashboard de Marketing</h2>
+                    <div class="connection-status" id="connection-status">
+                        <i class="fas fa-wifi"></i> Online
+                    </div>
+                </div>
+            </div>
+            <div class="toolbar-right">
+                <div class="user-menu">
+                    <div class="user-avatar" id="user-avatar">U</div>
+                    <span id="user-name">Usuário</span>
+                    <div class="dropdown-menu">
+                        <a href="#" onclick="window.showProjectManager && showProjectManager()"><i class="fas fa-th-large"></i> Projetos</a>
+                        <a href="#" onclick="window.showSettings && showSettings()"><i class="fas fa-cog"></i> Configurações</a>
+                        <a href="#" onclick="window.authManager && window.authManager.logout()"><i class="fas fa-sign-out-alt"></i> Sair</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Dashboard Navigation -->
+    <nav id="dashboard-nav" style="display: none;">
+        <div class="nav-categories">
+            <button class="nav-category active" data-category="email" onclick="window.loadDashboard && loadDashboard('email')">
+                <i class="fas fa-envelope"></i>
+                <span>E-mail Marketing</span>
+            </button>
+            <button class="nav-category" data-category="social" onclick="window.loadDashboard && loadDashboard('social')">
+                <i class="fas fa-share-alt"></i>
+                <span>Redes Sociais</span>
+            </button>
+            <button class="nav-category" data-category="ads" onclick="window.loadDashboard && loadDashboard('ads')">
+                <i class="fas fa-ad"></i>
+                <span>Google Ads</span>
+            </button>
+            <button class="nav-category" data-category="analytics" onclick="window.loadDashboard && loadDashboard('analytics')">
+                <i class="fas fa-chart-bar"></i>
+                <span>Google Analytics</span>
+            </button>
+        </div>
+    </nav>
+    
+    <!-- Dashboard Container -->
+    <div id="dashboard-container" style="display: none;">
+        <!-- Loading Skeleton -->
+        <div id="loading-skeleton" class="loading-skeleton" style="display: none;">
+            <div class="skeleton-header"></div>
+            <div class="skeleton-kpi">
+                <div class="skeleton-kpi-card"></div>
+                <div class="skeleton-kpi-card"></div>
+                <div class="skeleton-kpi-card"></div>
+                <div class="skeleton-kpi-card"></div>
+            </div>
+            <div class="skeleton-charts">
+                <div class="skeleton-chart"></div>
+                <div class="skeleton-chart"></div>
+                <div class="skeleton-chart"></div>
+                <div class="skeleton-chart"></div>
+            </div>
+        </div>
+        
+        <!-- Main Dashboard Content -->
+        <div id="main-dashboard" class="dashboard">
+            <!-- Dashboard Controls -->
+            <div class="dashboard-controls">
+                <div class="date-range-selector">
+                    <button class="date-range-btn" data-range="7d" onclick="window.setDateRange && setDateRange('7d')">7 dias</button>
+                    <button class="date-range-btn active" data-range="30d" onclick="window.setDateRange && setDateRange('30d')">30 dias</button>
+                    <button class="date-range-btn" data-range="90d" onclick="window.setDateRange && setDateRange('90d')">90 dias</button>
+                    <button class="date-range-btn" data-range="custom" onclick="window.toggleCustomDateRange && toggleCustomDateRange()">
+                        <i class="fas fa-calendar-alt"></i> Personalizado
+                    </button>
+                    <div class="custom-date-range" id="custom-date-range" style="display: none;">
+                        <input type="date" id="start-date">
+                        <span>até</span>
+                        <input type="date" id="end-date">
+                        <button id="apply-date-range" onclick="window.applyCustomDateRange && applyCustomDateRange()">Aplicar</button>
+                    </div>
+                    <div class="date-range-display">
+                        <i class="fas fa-calendar"></i>
+                        <span id="date-range-text">Últimos 30 dias</span>
+                    </div>
+                </div>
+                <div class="dashboard-actions">
+                    <button onclick="window.refreshData && refreshData()" class="btn btn-secondary" title="Atualizar dados">
+                        <i class="fas fa-redo"></i>
+                    </button>
+                    <button onclick="window.exportDashboard && exportDashboard()" class="btn btn-secondary" title="Exportar dashboard">
+                        <i class="fas fa-download"></i>
+                    </button>
+                    <button onclick="window.toggleFullscreen && toggleFullscreen()" class="btn btn-secondary" title="Tela cheia">
+                        <i class="fas fa-expand"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- KPI Cards -->
+            <div class="kpi-grid" id="kpi-cards">
+                <!-- KPI cards will be loaded here dynamically -->
+            </div>
+            
+            <!-- Insights Section -->
+            <div class="insights-section">
+                <h3><i class="fas fa-lightbulb"></i> Insights Inteligentes</h3>
+                <div class="insights-container" id="insights-container">
+                    <!-- Insights will be loaded here dynamically -->
+                </div>
+            </div>
+            
+            <!-- Charts Grid -->
+            <div class="charts-grid" id="charts-grid">
+                <!-- Charts will be loaded here dynamically -->
+            </div>
+            
+            <!-- Data Table Section -->
+            <div class="data-table-section" id="data-table-section">
+                <h3><i class="fas fa-table"></i> Dados Detalhados</h3>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr id="table-headers">
+                                <!-- Table headers will be loaded here dynamically -->
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                            <!-- Table data will be loaded here dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Dashboard Footer -->
+    <footer id="dashboard-footer" style="display: none;">
+        <div class="footer-content">
+            <div class="footer-left">
+                <div class="data-info">
+                    <span><i class="fas fa-database"></i> <span id="data-points">0</span> pontos de dados</span>
+                    <span class="divider">|</span>
+                    <span><i class="fas fa-clock"></i> Última atualização: <span id="last-update">--:--</span></span>
+                </div>
+            </div>
+            <div class="footer-right">
+                <div class="alerts">
+                    <i class="fas fa-bell"></i>
+                    <span class="alert-count" id="alerts-count">0</span> alertas
+                </div>
+                <div class="theme-toggle">
+                    <button onclick="window.toggleTheme && toggleTheme()">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Notifications Container -->
+    <div id="notification-container" class="notification-container"></div>
+    
+    <!-- Scripts in correct order -->
+    <!-- Firebase SDK (apenas auth por enquanto) -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    
+    <!-- Bibliotecas de Terceiros -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <!-- Core Scripts -->
+    <script src="scripts/config.js"></script>
+    <script src="scripts/utils.js"></script>
+    
+    <!-- Managers (Classes) - Note que removemos a pasta 'managers/' -->
+    <script src="scripts/auth.js"></script>      <!-- Contém AuthManager -->
+    <script src="scripts/projects.js"></script>  <!-- Contém ProjectManager -->
+    <script src="scripts/charts.js"></script>    <!-- Contém ChartManager -->
+    <script src="scripts/insights.js"></script>  <!-- Contém InsightsManager -->
+    <script src="scripts/export.js"></script>    <!-- Contém ExportManager -->
+    
+    <!-- Arquivos que faltavam -->
+    <script src="scripts/theme.js"></script>     <!-- ThemeManager -->
+    <script src="scripts/data.js"></script>      <!-- DataManager -->
+    
+    <!-- Main Application Logic -->
+    <script src="scripts/main.js"></script>
+</body>
+</html>
