@@ -6,7 +6,7 @@ class AuthManager {
         
         // Configurações da API - serão sobrescritas por config.js
         this.config = {
-            API_BASE_URL: 'http://localhost:8000', // Default, será atualizado
+            API_BASE_URL: 'https://dashmaster-7tyt.onrender.com', // Default, será atualizado
             ENDPOINTS: {
                 LOGIN: '/auth/token',            // CORRIGIDO: /auth/token em vez de /api/auth/login
                 REGISTER: '/auth/register',
