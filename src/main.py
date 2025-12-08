@@ -24,7 +24,7 @@ app.add_middleware(
 )
 
 # Incluir Rotas
-app.include_router(auth_router.router, prefix="/api")
+app.include_router(auth_router, prefix="/api/auth")
 app.include_router(projects_router.router, prefix="/api")
 app.include_router(dashboard_router.router, prefix="/api")
 
