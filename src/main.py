@@ -21,7 +21,6 @@ app.add_middleware(
     allow_origins=["*"], # Em produção, restrinja isso
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allow_headers=["*"],
 )
 
 # Incluir Rotas
