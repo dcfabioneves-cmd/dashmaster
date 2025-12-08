@@ -8,7 +8,7 @@ class AuthManager {
         this.config = {
             API_BASE_URL: 'https://dashmaster-7tyt.onrender.com/api', // Default, será atualizado
             ENDPOINTS: {
-                LOGIN: '/auth/token',            // CORRIGIDO: /auth/token em vez de /api/auth/login
+                LOGIN: '/auth/login',            // CORRIGIDO: /auth/token em vez de /api/auth/login
                 REGISTER: '/auth/register',
                 GOOGLE_AUTH: '/auth/google',
                 LOGOUT: '/auth/logout',
