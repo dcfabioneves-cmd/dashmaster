@@ -31,8 +31,8 @@ class AuthManager {
     }
     
     updateConfig(config) {
-        if (config.API_BASE_URL) {
-            this.config.API_BASE_URL = config.API_BASE_URL;
+        if (config.API.BASE_URL) {
+            this.config.API.BASE_URL = config.API.BASE_URL;
         }
         if (config.ENDPOINTS) {
             this.config.ENDPOINTS = { ...this.config.ENDPOINTS, ...config.ENDPOINTS };
@@ -41,7 +41,7 @@ class AuthManager {
 
     async init() {
         console.log('🚀 Initializing AuthManager with Python Backend...');
-        console.log(`📡 API Base URL: ${this.config.API_BASE_URL}`);
+        console.log(`📡 API Base URL: ${this.config.API.BASE_URL}`);
         
         this.setupLocalAuth();
     }
