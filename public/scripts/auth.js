@@ -3,12 +3,13 @@ class AuthManager {
     constructor() {
         this.currentUser = null;
         this.isLoginMode = true;
+        this.token = null;
         
-        // Configurações da API - serão sobrescritas por config.js
+        // Configurações da API
         this.config = {
-            API_BASE_URL: 'https://dashmaster-7tyt.onrender.com/api', // Default, será atualizado
+            API_BASE_URL: 'https://dashmaster-7tyt.onrender.com/api',
             ENDPOINTS: {
-                LOGIN: '/auth/login',            // CORRIGIDO: /auth/token em vez de /api/auth/login
+                LOGIN: '/auth/token',  // CORRIGIDO: agora aponta para /auth/token
                 REGISTER: '/auth/register',
                 GOOGLE_AUTH: '/auth/google',
                 LOGOUT: '/auth/logout',
@@ -32,7 +33,8 @@ class AuthManager {
     
     updateConfig(config) {
         if (config.API_BASE_URL) {
-            this.config.API_BASE_URL = config.API_BASE_URL;
+            // Garante que não haja dupla barra
+            this.config.API_BASE_URL = config.API_BASE_URL.replace(/\/$/, '');
         }
         if (config.ENDPOINTS) {
             this.config.ENDPOINTS = { ...this.config.ENDPOINTS, ...config.ENDPOINTS };
@@ -41,7 +43,7 @@ class AuthManager {
 
     async init() {
         console.log('🚀 Initializing AuthManager with Python Backend...');
-        console.log(`📡 API Base URL: ${this.config.API_BASE_URL}`);
+        console.log('📡 API Configuration:', this.config);
         
         this.setupLocalAuth();
     }
@@ -49,7 +51,7 @@ class AuthManager {
     setupLocalAuth() {
         console.log('🔐 Setting up authentication forms...');
         
-        // Load user token from localStorage (SEM SENHAS!)
+        // Load user token from localStorage
         const savedUser = localStorage.getItem('dashmaster_user');
         const savedToken = localStorage.getItem('dashmaster_token');
         
@@ -76,6 +78,8 @@ class AuthManager {
                 console.warn('⚠️ Invalid saved user data, clearing...');
                 this.clearAuthData();
             }
+        } else {
+            this.showAuthScreen();
         }
         
         // Setup local form events
@@ -102,15 +106,6 @@ class AuthManager {
             e.preventDefault();
             this.handleAuthSubmit();
         });
-        
-        // Google Sign-In button (se existir)
-        const googleBtn = document.getElementById('google-signin');
-        if (googleBtn) {
-            googleBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                this.loginWithGoogle();
-            });
-        }
         
         // Update initial UI
         this.updateAuthUI();
@@ -219,49 +214,80 @@ class AuthManager {
     }
 
     async login(email, password) {
-        console.log('🔑 Autenticando com API Python...', email);
+        console.log('🔑 Tentando login...', email);
         
         try {
-            // CORREÇÃO: FastAPI espera os dados como formulário (x-www-form-urlencoded), não JSON
+            // Formato correto para FastAPI OAuth2
             const formData = new URLSearchParams();
-            formData.append('username', email); // FastAPI usa 'username' por padrão, mesmo sendo email
+            formData.append('username', email);
             formData.append('password', password);
 
-            // CORREÇÃO: A rota correta definida no FastAPI é '/auth/token', não '/auth/login'
-            const response = await fetch(`${this.config.API_BASE_URL}/auth/token`, {
+            // URL corrigida - usando endpoint correto
+            const loginUrl = `${this.config.API_BASE_URL}${this.config.ENDPOINTS.LOGIN}`;
+            console.log('🌐 Login URL:', loginUrl);
+            
+            const response = await fetch(loginUrl, {
                 method: 'POST',
                 headers: { 
-                    'Content-Type': 'application/x-www-form-urlencoded' 
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Accept': 'application/json'
                 },
                 body: formData
             });
 
+            console.log('📊 Response status:', response.status, response.statusText);
+            
             if (!response.ok) {
                 // Tenta ler a mensagem de erro do backend
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.detail || 'Falha na conexão ou credenciais inválidas');
+                let errorMessage = 'Falha na conexão ou credenciais inválidas';
+                try {
+                    const errorData = await response.json();
+                    errorMessage = errorData.detail || errorData.message || errorMessage;
+                    console.error('📝 Error details:', errorData);
+                } catch (parseError) {
+                    console.error('❌ Failed to parse error response:', parseError);
+                }
+                throw new Error(errorMessage);
             }
 
             const data = await response.json();
+            console.log('✅ Login response:', data);
             
-            // CORREÇÃO DE SEGURANÇA: Salvar apenas o token e dados não sensíveis
-            this.currentUser = {
-                email: email,
-                name: email.split('@')[0] // Nome temporário baseado no email
-            };
+            if (!data.access_token) {
+                throw new Error('Token de acesso não recebido do servidor');
+            }
+            
+            // Buscar informações do usuário para salvar
+            const userResponse = await fetch(`${this.config.API_BASE_URL}/auth/profile`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${data.access_token}`,
+                    'Accept': 'application/json'
+                }
+            }).catch(() => null); // Se falhar, não é crítico
+            
+            if (userResponse && userResponse.ok) {
+                const userData = await userResponse.json();
+                this.currentUser = {
+                    email: userData.email || email,
+                    name: userData.full_name || email.split('@')[0],
+                    ...userData
+                };
+            } else {
+                // Se não conseguir buscar o perfil, cria objeto básico
+                this.currentUser = {
+                    email: email,
+                    name: email.split('@')[0]
+                };
+            }
             
             this.token = data.access_token;
             
-            // NUNCA salvar senhas no localStorage!
+            // Salvar dados no localStorage
             localStorage.setItem('dashmaster_user', JSON.stringify(this.currentUser));
             localStorage.setItem('dashmaster_token', this.token);
             
-            // Se houver refresh token, salvar também
-            if (data.refresh_token) {
-                localStorage.setItem('dashmaster_refresh_token', data.refresh_token);
-            }
-            
-            console.log('✅ Login successful via Python API:', this.currentUser);
+            console.log('✅ Login successful:', this.currentUser);
             
             // Update AppState
             window.AppState.currentUser = this.currentUser;
@@ -270,6 +296,8 @@ class AuthManager {
             // Show success and navigate
             if (window.showProjectManager) {
                 window.showProjectManager();
+            } else {
+                console.warn('⚠️ showProjectManager não está definido');
             }
             
             if (window.showNotification) {
@@ -280,8 +308,10 @@ class AuthManager {
             console.error('❌ Login error:', error);
             
             // Mensagem amigável se o servidor estiver desligado
-            if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
-                throw new Error('Não foi possível conectar ao servidor. Verifique se o Python está rodando.');
+            if (error.message.includes('Failed to fetch') || 
+                error.message.includes('NetworkError') ||
+                error.message.includes('Failed to connect')) {
+                throw new Error('Não foi possível conectar ao servidor. Verifique sua conexão.');
             }
             
             throw error;
@@ -289,14 +319,18 @@ class AuthManager {
     }
 
     async register(email, password, name) {
-        console.log('📝 Attempting to register with Python Backend:', { email, name });
+        console.log('📝 Tentando registrar:', { email, name });
         
         try {
-            // Para registro, ainda usamos JSON
-            const response = await fetch(`${this.config.API_BASE_URL}${this.config.ENDPOINTS.REGISTER}`, {
+            // URL de registro
+            const registerUrl = `${this.config.API_BASE_URL}${this.config.ENDPOINTS.REGISTER}`;
+            console.log('🌐 Register URL:', registerUrl);
+            
+            const response = await fetch(registerUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Accept': 'application/json'
                 },
                 body: JSON.stringify({
                     email: email,
@@ -305,59 +339,63 @@ class AuthManager {
                 })
             });
 
+            console.log('📊 Register response status:', response.status);
+            
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.detail || errorData.message || 'Falha no registro');
+                let errorMessage = 'Falha no registro';
+                try {
+                    const errorData = await response.json();
+                    errorMessage = errorData.detail || errorData.message || errorMessage;
+                    console.error('📝 Register error details:', errorData);
+                } catch (parseError) {
+                    console.error('❌ Failed to parse register error:', parseError);
+                }
+                throw new Error(errorMessage);
             }
 
             const data = await response.json();
+            console.log('✅ Register response:', data);
             
-            if (data.status !== 'success') {
-                throw new Error(data.message || 'Falha no registro');
+            if (!data.message) {
+                throw new Error('Resposta inválida do servidor');
             }
             
-            // CORREÇÃO DE SEGURANÇA: Salvar apenas o token e dados não sensíveis
-            this.currentUser = {
-                id: data.user.id,
-                email: data.user.email,
-                name: data.user.name,
-                created_at: data.user.created_at
-            };
-            
-            this.token = data.access_token;
-            
-            // NUNCA salvar senhas no localStorage!
-            localStorage.setItem('dashmaster_user', JSON.stringify(this.currentUser));
-            localStorage.setItem('dashmaster_token', this.token);
-            
-            if (data.refresh_token) {
-                localStorage.setItem('dashmaster_refresh_token', data.refresh_token);
-            }
-            
-            console.log('✅ User registered successfully via Python API:', this.currentUser);
-            
-            // Update AppState
-            window.AppState.currentUser = this.currentUser;
-            window.AppState.token = this.token;
-            
-            // Show success and navigate
-            if (window.showProjectManager) {
-                window.showProjectManager();
-            }
-            
+            // Registro bem sucedido, mostra mensagem e volta para tela de login
             if (window.showNotification) {
-                window.showNotification('Conta criada com sucesso!', 'success');
+                window.showNotification('Conta criada com sucesso! Por favor, faça login.', 'success');
             }
             
-            // Switch back to login mode for next time
+            // Switch back to login mode
             this.isLoginMode = true;
             this.updateAuthUI();
+            
+            // Preenche automaticamente o email no formulário de login
+            const emailInput = document.getElementById('email');
+            if (emailInput) {
+                emailInput.value = email;
+            }
+            
+            // Limpa outros campos
+            const passwordInput = document.getElementById('password');
+            const nameInput = document.getElementById('name');
+            const confirmInput = document.getElementById('confirm-password');
+            
+            if (passwordInput) passwordInput.value = '';
+            if (nameInput) nameInput.value = '';
+            if (confirmInput) confirmInput.value = '';
+            
+            // Foca no campo de senha para o usuário preencher
+            if (passwordInput) {
+                passwordInput.focus();
+            }
             
         } catch (error) {
             console.error('❌ Registration error:', error);
             
             // Log adicional para debugging
-            if (error.message.includes('NetworkError') || error.message.includes('Failed to fetch')) {
+            if (error.message.includes('NetworkError') || 
+                error.message.includes('Failed to fetch') ||
+                error.message.includes('Failed to connect')) {
                 throw new Error('Não foi possível conectar ao servidor. Verifique sua conexão.');
             }
             
@@ -365,84 +403,22 @@ class AuthManager {
         }
     }
 
-    async loginWithGoogle() {
-        try {
-            // Primeiro, autentica com Google
-            const googleUser = await this.googleSignIn();
-            const idToken = googleUser.getAuthResponse().id_token;
-            
-            // Envia token para nosso backend
-            const response = await fetch(`${this.config.API_BASE_URL}auth/token`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: JSON.stringify({ token: idToken })
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.detail || 'Falha na autenticação Google');
-            }
-
-            const data = await response.json();
-            
-            if (data.status !== 'success') {
-                throw new Error(data.message || 'Falha na autenticação Google');
-            }
-            
-            // Salva dados do usuário
-            this.currentUser = data.user;
-            this.token = data.access_token;
-            
-            localStorage.setItem('dashmaster_user', JSON.stringify(this.currentUser));
-            localStorage.setItem('dashmaster_token', this.token);
-            
-            window.AppState.currentUser = this.currentUser;
-            window.AppState.token = this.token;
-            
-            if (window.showProjectManager) {
-                window.showProjectManager();
-            }
-            
-        } catch (error) {
-            console.error('❌ Google login error:', error);
-            this.showAuthError('Falha na autenticação com Google');
-        }
-    }
-
-    async googleSignIn() {
-        return new Promise((resolve, reject) => {
-            // Inicializa Google Auth se não estiver
-            if (!window.gapi || !window.gapi.auth2) {
-                reject(new Error('Google Auth não carregado'));
-                return;
-            }
-            
-            const auth2 = window.gapi.auth2.getAuthInstance();
-            if (!auth2) {
-                reject(new Error('Google Auth não inicializado'));
-                return;
-            }
-            
-            auth2.signIn().then(resolve).catch(reject);
-        });
-    }
-
     async validateToken() {
         if (!this.token) return false;
         
         try {
-            // Verifica se token está próximo de expirar (opcional)
-            // Pode implementar validação JWT no cliente ou chamar endpoint de validação
-            const tokenData = JSON.parse(atob(this.token.split('.')[1]));
+            // Verifica se token está próximo de expirar
+            const tokenParts = this.token.split('.');
+            if (tokenParts.length !== 3) return false;
+            
+            const tokenData = JSON.parse(atob(tokenParts[1]));
             const expirationTime = tokenData.exp * 1000; // Convert to milliseconds
             const currentTime = Date.now();
             
             // Token expirou?
             if (currentTime > expirationTime) {
-                console.log('Token expirado, tentando refresh...');
-                return await this.refreshToken();
+                console.log('Token expirado');
+                return false;
             }
             
             // Token ainda válido (com 5 minutos de margem)
@@ -454,50 +430,16 @@ class AuthManager {
         }
     }
 
-    async refreshToken() {
-        try {
-            const refreshToken = localStorage.getItem('dashmaster_refresh_token');
-            if (!refreshToken) return false;
-            
-            const response = await fetch(`${this.config.API_BASE_URL}${this.config.ENDPOINTS.REFRESH_TOKEN}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${this.token}`
-                },
-                body: JSON.stringify({ refresh_token: refreshToken })
-            });
-
-            if (!response.ok) {
-                return false;
-            }
-
-            const data = await response.json();
-            
-            if (data.status === 'success') {
-                this.token = data.access_token;
-                localStorage.setItem('dashmaster_token', this.token);
-                
-                if (data.refresh_token) {
-                    localStorage.setItem('dashmaster_refresh_token', data.refresh_token);
-                }
-                
-                return true;
-            }
-            
-            return false;
-            
-        } catch (error) {
-            console.error('❌ Token refresh error:', error);
-            return false;
-        }
-    }
-
     getAuthHeaders() {
-        return {
-            'Authorization': `Bearer ${this.token}`,
-            'Content-Type': 'application/json'
+        const headers = {
+            'Accept': 'application/json'
         };
+        
+        if (this.token) {
+            headers['Authorization'] = `Bearer ${this.token}`;
+        }
+        
+        return headers;
     }
 
     showAuthError(message) {
@@ -545,7 +487,7 @@ class AuthManager {
                 }
             }
             
-            // Clear local data - CORREÇÃO DE SEGURANÇA
+            // Clear local data
             this.clearAuthData();
             
             // Clear AppState
@@ -553,11 +495,7 @@ class AuthManager {
             window.AppState.token = null;
             
             // Redirect to login
-            if (window.showAuthScreen) {
-                window.showAuthScreen();
-            } else {
-                window.location.reload();
-            }
+            this.showAuthScreen();
             
             if (window.showNotification) {
                 window.showNotification('Logout realizado com sucesso', 'info');
@@ -568,15 +506,11 @@ class AuthManager {
             
             // Mesmo com erro, limpa os dados locais
             this.clearAuthData();
-            
-            if (window.showNotification) {
-                window.showNotification('Erro ao fazer logout', 'error');
-            }
+            this.showAuthScreen();
         }
     }
 
     clearAuthData() {
-        // CORREÇÃO DE SEGURANÇA: Remove todos os dados de autenticação
         this.currentUser = null;
         this.token = null;
         
@@ -584,10 +518,9 @@ class AuthManager {
         localStorage.removeItem('dashmaster_token');
         localStorage.removeItem('dashmaster_refresh_token');
         
-        // REMOVE COMPLETAMENTE os dados antigos e inseguros
+        // Remove dados antigos
         localStorage.removeItem('currentUser');
-        localStorage.removeItem('users'); // ⚠️ Remove as senhas em texto plano!
-        sessionStorage.clear();
+        localStorage.removeItem('users');
     }
 
     showAuthScreen() {
@@ -614,6 +547,11 @@ class AuthManager {
         if (passwordInput) passwordInput.value = '';
         if (nameInput) nameInput.value = '';
         if (confirmInput) confirmInput.value = '';
+        
+        // Foca no email
+        if (emailInput) {
+            setTimeout(() => emailInput.focus(), 100);
+        }
     }
 
     // Helper methods
@@ -631,7 +569,6 @@ class AuthManager {
 }
 
 // ===== INSTANCIAÇÃO E EXPORTAÇÃO =====
-// Espera o DOM estar carregado e as configurações disponíveis
 document.addEventListener('DOMContentLoaded', () => {
     // Cria instância global do AuthManager
     window.authManager = new AuthManager();
@@ -644,6 +581,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Expor métodos globais para compatibilidade
     window.showAuthScreen = () => window.authManager.showAuthScreen();
     window.isAuthenticated = () => window.authManager.isAuthenticated();
+    window.logout = () => window.authManager.logout();
 });
 
 // Export para módulos ES6 (se aplicável)
@@ -651,4 +589,4 @@ if (typeof module !== 'undefined' && module.exports) {
     module.exports = AuthManager;
 }
 
-console.log('✅ AuthManager loaded and ready for Python Backend integration');
+console.log('✅ AuthManager loaded and ready');
