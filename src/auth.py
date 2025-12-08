@@ -9,7 +9,7 @@ from src.config import settings
 from src.database import get_db, User
 
 # Configuração de Hash de Senha
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/token")
 
 # Funções Auxiliares
