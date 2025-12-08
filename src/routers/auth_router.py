@@ -6,7 +6,7 @@ from src.database import get_db, User
 from src.auth import verify_password, get_password_hash, create_access_token, settings
 from datetime import timedelta
 
-router = APIRouter(prefix="/auth")
+router = APIRouter()
 
 class UserCreate(BaseModel):
     email: str
