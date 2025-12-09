@@ -11,3 +11,4 @@ pandas
 scikit-learn
 numpy
 argon2-cffi
+psycopg2-binary
