@@ -1,12 +1,16 @@
 from sqlalchemy import create_engine, Column, Integer, String, Boolean, ForeignKey, JSON
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, relationship
+from sqlalchemy.orm import sessionmaker, relationship, declarative_base
 from src.config import settings
 
-# Configuração do Engine
+# Detecta se é SQLite
+is_sqlite = settings.DATABASE_URL.startswith("sqlite")
+
+# Configuração dinâmica conforme o tipo de banco
 engine = create_engine(
-    settings.DATABASE_URL, connect_args={"check_same_thread": False} # check_same_thread é apenas para SQLite
+    settings.DATABASE_URL,
+    connect_args={"check_same_thread": False} if is_sqlite else {}
 )
+
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
@@ -30,7 +34,7 @@ class Project(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
     spreadsheet_url = Column(String)
-    categories = Column(JSON) # Armazena array de strings como JSON
+    categories = Column(JSON)
     owner_id = Column(Integer, ForeignKey("users.id"))
 
     owner = relationship("User", back_populates="projects")
