@@ -7,8 +7,8 @@ python-jose[cryptography]==3.3.0
 passlib[argon2]==1.7.4
 gspread==6.0.0
 oauth2client==4.1.3
-pandas==2.1.4  # ✅ Agora funciona com Python 3.11
-scikit-learn==1.3.2
-numpy==1.26.2
+# pandas==2.1.4  # ⚠️ COMENTE POR ENQUANTO!
+# scikit-learn==1.3.2  # ⚠️ COMENTE POR ENQUANTO!
+# numpy==1.26.2  # ⚠️ COMENTE POR ENQUANTO!
 argon2-cffi==23.1.0
 psycopg2-binary==2.9.9
