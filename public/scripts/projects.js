@@ -799,12 +799,28 @@ class ProjectManager {
     }
 }
 
+
 // ===== EXPORTAÇÃO =====
 window.ProjectManager = ProjectManager;
+
+// Instanciar o ProjectManager quando o DOM estiver pronto
+document.addEventListener('DOMContentLoaded', () => {
+    if (!window.projectManager) {
+        window.projectManager = new ProjectManager();
+        console.log('✅ ProjectManager instanciado via projects.js'); 
+    }
+});
 
 // Funções globais auxiliares que podem ser chamadas pelo HTML
 window.createNewProject = function() {
     if (window.projectManager) {
         window.projectManager.showNewProjectModal();
+    } else {
+        console.error('ProjectManager não encontrado!');
+        // Tentar recuperar ou instanciar de emergência
+        if (window.ProjectManager) {
+            window.projectManager = new window.ProjectManager();
+            window.projectManager.showNewProjectModal();
+        }
     }
 };
