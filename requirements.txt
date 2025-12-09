@@ -1,13 +1,9 @@
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
 python-dotenv==1.0.0
-sqlalchemy==2.0.27  
+sqlalchemy==2.0.23  # Agora funciona com Python 3.11
 python-multipart==0.0.6
 python-jose[cryptography]==3.3.0
 passlib[argon2]==1.7.4
 argon2-cffi==23.1.0
 psycopg2-binary==2.9.9
-
-# COMENTE TEMPORARIAMENTE:
-# gspread==6.0.0
-# oauth2client==4.1.3
