@@ -23,9 +23,10 @@ app.add_middleware(
 )
 
 # Rotas
-app.include_router(auth_router, prefix="/api/auth")
-app.include_router(projects_router, prefix="/api/projects")
-app.include_router(dashboard_router, prefix="/api/dashboard")
+# Rotas
+app.include_router(auth_router, prefix="/api")
+app.include_router(projects_router, prefix="/api")
+app.include_router(dashboard_router, prefix="/api")
 
 # Frontend estático
 app.mount("/", StaticFiles(directory="public", html=True), name="public")
