@@ -53,6 +53,15 @@ async def register(user: UserCreate, db: AsyncSession = Depends(get_db)):
     
     return {"message": "Usuário criado com sucesso", "user_id": new_user.id}
 
+@router.get("/profile")
+async def get_profile(current_user: User = Depends(get_current_user)):
+    return {
+        "id": current_user.id,
+        "email": current_user.email,
+        "username": current_user.username,
+        "created_at": current_user.created_at
+    }
+
 @router.post("/token")
 async def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
@@ -85,5 +94,5 @@ async def login(
         "access_token": access_token, 
         "token_type": "bearer",
         "user_email": user.email,
-        "user_name": user.username # Mudado de full_name para username
+        "user_name": user.username
     }
