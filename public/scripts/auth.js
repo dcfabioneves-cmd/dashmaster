@@ -6,10 +6,13 @@ class AuthManager {
         this.token = null;
 
         // Configurações da API
+        // Configurações da API - Usa GLOBAL CONFIG ou fallback relativo seguro
+        const globalConfig = window.AppConfig || window.CONFIG || {};
+
         this.config = {
-            API_BASE_URL: '/api',
-            ENDPOINTS: {
-                LOGIN: '/auth/token',  // CORRIGIDO: agora aponta para /auth/token
+            API_BASE_URL: globalConfig.API ? globalConfig.API.BASE_URL : '/api',
+            ENDPOINTS: (globalConfig.API && globalConfig.API.ENDPOINTS) ? globalConfig.API.ENDPOINTS : {
+                LOGIN: '/auth/token',
                 REGISTER: '/auth/register',
                 GOOGLE_AUTH: '/auth/google',
                 LOGOUT: '/auth/logout',
