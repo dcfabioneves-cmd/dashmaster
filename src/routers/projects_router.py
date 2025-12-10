@@ -21,14 +21,14 @@ class ProjectOut(ProjectBase):
     class Config:
         orm_mode = True
 
-@router.get("/", response_model=List[ProjectOut])
+@router.get("", response_model=List[ProjectOut])
 async def get_my_projects(db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)):
     # Em async, não podemos confiar no lazy loading de current_user.projects
     # É mais seguro buscar diretamente na tabela de projetos
     result = await db.execute(select(Project).where(Project.owner_id == current_user.id))
     return result.scalars().all()
 
-@router.post("/", response_model=ProjectOut)
+@router.post("", response_model=ProjectOut)
 async def create_project(project: ProjectBase, db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)):
     db_project = Project(
         name=project.name,
