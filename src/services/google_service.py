@@ -1,49 +1,74 @@
-import gspread
-from oauth2client.service_account import ServiceAccountCredentials
-from src.config import settings
-import os
+# 🚀 Guia de Publicação do DashMaster no Render
 
-class GoogleSheetService:
-    def __init__(self):
-        self.scope = [
-            "https://spreadsheets.google.com/feeds",
-            "https://www.googleapis.com/auth/drive"
-        ]
-        self.creds_path = settings.CREDENTIALS_PATH
-        self.client = None
+Este guia vai te levar do zero ao site no ar em cerca de 10-15 minutos.
 
-    def _authenticate(self):
-        if not os.path.exists(self.creds_path):
-            # Retorna None para usar dados Mock se não houver arquivo
-            print(f"⚠️ Aviso: Arquivo {self.creds_path} não encontrado.")
-            return None
-            
-        creds = ServiceAccountCredentials.from_json_keyfile_name(self.creds_path, self.scope)
-        self.client = gspread.authorize(creds)
-        return self.client
+## Pré-requisitos
+- Uma conta no [Render.com](https://dashboard.render.com/register) (pode usar o GitHub/Google).
+- O código do seu projeto já deve estar no GitHub/GitLab.
 
-    def get_sheet_data(self, spreadsheet_url: str):
-        if not self.client:
-            if not self._authenticate():
-                # Retorna dados simulados se falhar auth
-                return self._get_mock_data()
+---
 
-        try:
-            sheet = self.client.open_by_url(spreadsheet_url)
-            worksheet = sheet.get_worksheet(0) # Pega a primeira aba
-            records = worksheet.get_all_records()
-            return records
-        except Exception as e:
-            print(f"Erro ao acessar Google Sheets: {e}")
-            return self._get_mock_data()
+## Passo 1: O Banco de Dados (PostgreSQL)
 
-    def _get_mock_data(self):
-        # Dados de fallback para teste
-        return [
-            {"date": "2023-01", "taxa_abertura": 20, "engajamento": 50, "valor": 1000},
-            {"date": "2023-02", "taxa_abertura": 22, "engajamento": 55, "valor": 1200},
-            {"date": "2023-03", "taxa_abertura": 18, "engajamento": 40, "valor": 900},
-            {"date": "2023-04", "taxa_abertura": 25, "engajamento": 60, "valor": 1500},
-            {"date": "2023-05", "taxa_abertura": 26, "engajamento": 65, "valor": 1600},
-            {"date": "2023-06", "taxa_abertura": 30, "engajamento": 70, "valor": 2000},
-        ]
+Como o Render apaga arquivos locais quando reinicia, precisamos de um banco profissional.
+
+1. No Dashboard do Render, clique em **New +** > **PostgreSQL**.
+2. **Name**: `dashmaster-db`
+3. **Region**: Escolha a mais próxima (ex: `Ohio (US East)`).
+4. **PostgreSQL Version**: Pode deixar a padrão (16 ou 15).
+5. **Instance Type**: `Free` (Gratuito).
+6. Clique em **Create Database**.
+
+🛑 **PAUSE E AGUARDE**: Leva uns 2 minutos para ficar "Available".
+Assim que ficar pronto:
+1. Vá na seção **Connections**.
+2. Copie a **Internal Database URL** (começa com `postgres://...`). Vamos chamar de **`DB_INTERNAL_URL`**.
+
+---
+
+## Passo 2: O Site (Web Service)
+
+1. No Dashboard, clique em **New +** > **Web Service**.
+2. Conecte seu repositório do GitHub (`dashmaster`).
+3. Preencha os dados:
+   - **Name**: `dashmaster-app`
+   - **Region**: A MESMA do banco de dados (ex: `Ohio`).
+   - **Branch**: `main` (ou a branch que você está usando).
+   - **Runtime**: `Python 3`
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `uvicorn src.main:app --host 0.0.0.0 --port 10000`
+   - **Instance Type**: `Free`.
+
+4. **Variáveis de Ambiente (Environment Variables)**:
+   Clique em **Advanced** ou role até **Environment Variables** e adicione:
+
+   | Key | Value |
+   | :--- | :--- |
+   | `PYTHON_VERSION` | `3.11.9` |
+   | `DATABASE_URL` | Cole a **`DB_INTERNAL_URL`** que você copiou do banco. |
+   | `SECRET_KEY` | Invente uma senha longa e segura (letras/numeros). |
+   | `GOOGLE_CREDENTIALS_JSON` | **Abra seu arquivo `credentials/service_account.json` no bloco de notas, copie TODO o conteúdo e cole aqui.** |
+
+5. Clique em **Create Web Service**.
+
+---
+
+## Passo 3: Testar
+
+O Render vai começar o "Build". Pode levar uns 5 minutos na primeira vez.
+Acompanhe os logs. Se aparecer `Application startup complete`, DEU CERTO! 🎉
+
+1. Clique na URL do seu site (algo como `https://dashmaster-app.onrender.com`).
+2. Tente fazer Login (Lembre-se: O banco é NOVO, seu usuário local não existe lá. Clique em **Registrar** ou crie um usuário novo).
+3. Teste criar um projeto.
+
+---
+
+## Solução de Problemas Comuns
+
+- **Erro "Internal Server Error" ao abrir o site**:
+  - Verifique os Logs no Render.
+  - Geralmente é a `DATABASE_URL` errada ou faltou a `SECRET_KEY`.
+
+- **Erro de Google Sheets**:
+  - Verifique se copiou o JSON *inteiro* para a variável `GOOGLE_CREDENTIALS_JSON`. Não pode faltar chaves `{ }`.
