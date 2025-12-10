@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import os
 import asyncio
 
-from src.database import init_db, engine
+from src.database import engine
 from src.routers.auth_router import router as auth_router
 from src.routers.projects_router import router as projects_router
 from src.routers.dashboard_router import router as dashboard_router
