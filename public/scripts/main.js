@@ -92,24 +92,8 @@ function syncManagers() {
  * Carrega configuração padrão
  */
 function loadDefaultConfig() {
-    window.CONFIG = {
-        API_BASE_URL: 'http://localhost:8000',
-        ENDPOINTS: {
-            LOGIN: '/api/auth/login',
-            REGISTER: '/api/auth/register',
-            GOOGLE_AUTH: '/api/auth/google',
-            LOGOUT: '/api/auth/logout',
-            PROFILE: '/api/auth/profile',
-            REFRESH_TOKEN: '/api/auth/refresh',
-            PROJECTS: '/api/projects',
-            DATA: '/api/data'
-        },
-        CACHE_DURATION: 5 * 60 * 1000,
-        MAX_FILE_SIZE: 10 * 1024 * 1024,
-        DEFAULT_DATE_RANGE: '30d',
-        CHART_ANIMATION_DURATION: 1000,
-        AUTO_REFRESH_INTERVAL: 300000
-    };
+    console.warn('⚠️ Configuração global não encontrada! Verifique o carregamento de config.js.');
+    // Não injetar defaults hardcoded para evitar conflitos de URL
 }
 
 function mapDOMElements() {
