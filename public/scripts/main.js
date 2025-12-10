@@ -9,7 +9,7 @@ const AppState = {
     sheetData: {},
     aiInsights: {},
     dataCache: new Map(),
-    theme: localStorage.getItem('theme') || 'light',
+    theme: 'light', // Force default light
     isFullscreen: false,
     isPresentationMode: false,
     isLoading: false,
