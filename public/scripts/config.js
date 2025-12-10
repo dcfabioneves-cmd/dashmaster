@@ -1044,6 +1044,8 @@ window.SecurityConfig = SecurityConfig;
 window.ApiConfig = ApiConfig;
 
 // Alias para compatibilidade
+// Alias para compatibilidade
 window.CONFIG = window.AppConfig;
+window.ApiConfig = ApiConfig; // Ensure ApiConfig is also available globally if needed by auth.js manually
 
 console.log('✅ Config loaded correctly.');
