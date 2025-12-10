@@ -8,11 +8,11 @@ from datetime import timedelta
 
 from src.database import get_db
 from src.models import User
-from src.auth import (
     verify_password, 
     get_password_hash, 
     create_access_token, 
-    ACCESS_TOKEN_EXPIRE_MINUTES
+    ACCESS_TOKEN_EXPIRE_MINUTES,
+    get_current_user
 )
 
 router = APIRouter(tags=["Authentication"])
