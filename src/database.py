@@ -1,35 +1,36 @@
-# --- MODELOS (Tabelas) ---
+# src/database.py
+import os
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
 
-class User(Base):
-    __tablename__ = "users"
+# Obtém a URL do banco (com fallback para SQLite local async)
+# Nota: SQLite async requer o driver 'aiosqlite'
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./dashmaster.db")
 
-    id = Column(Integer, primary_key=True, index=True)
-    email = Column(String, unique=True, index=True)
-    full_name = Column(String)
-    hashed_password = Column(String)
-    is_active = Column(Boolean, default=True)
+# Para asyncpg (Postgres), substitua "postgresql" por "postgresql+asyncpg"
+if "postgresql://" in DATABASE_URL:
+    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://")
+elif "postgres://" in DATABASE_URL: # Render fornece postgres://
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+asyncpg://")
 
-    projects = relationship("Project", back_populates="owner")
+# Configuração do Engine Async
+connect_args = {}
+if "sqlite" in DATABASE_URL:
+    connect_args = {"check_same_thread": False}
 
-class Project(Base):
-    __tablename__ = "projects"
+engine = create_async_engine(DATABASE_URL, echo=True, connect_args=connect_args)
 
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, index=True)
-    spreadsheet_url = Column(String)
-    categories = Column(JSON) # Armazena array de strings como JSON
-    owner_id = Column(Integer, ForeignKey("users.id"))
+# Sessão Async
+SessionLocal = sessionmaker(
+    engine, 
+    class_=AsyncSession, 
+    expire_on_commit=False
+)
 
-    owner = relationship("User", back_populates="projects")
+Base = declarative_base()
 
-# Cria as tabelas no banco de dados
-def init_db():
-    Base.metadata.create_all(bind=engine)
-
-# Dependência para pegar a sessão do DB
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+# Dependência para injeção de dependência (yield session)
+async def get_db():
+    async with SessionLocal() as session:
+        yield session
