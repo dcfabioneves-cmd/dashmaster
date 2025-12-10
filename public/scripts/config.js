@@ -6,17 +6,17 @@
 const AppConfig = {
     // Versão da aplicação
     VERSION: '2.0.0', // Nova versão com backend Python
-    
+
     // Ambiente
     ENVIRONMENT: 'development', // development, staging, production
-    
+
     // URLs da API - CORREÇÃO: Agora aponta para Python Backend
     API: {
         // CORREÇÃO: Adicionado /api no final para garantir compatibilidade com as rotas do Python
-        BASE_URL: 'http://localhost:8000/api', // Backend Python FastAPI
+        BASE_URL: '/api', // Backend Python FastAPI
         TIMEOUT: 30000 // 30 segundos
     },
-    
+
     // Configurações de cache
     CACHE: {
         DURATION: {
@@ -26,19 +26,19 @@ const AppConfig = {
         },
         MAX_ITEMS: 1000
     },
-    
+
     // Configurações de timeout
     TIMEOUT: {
         API_REQUEST: 30000,    // 30 segundos
         IMAGE_LOAD: 10000      // 10 segundos
     },
-    
+
     // Configurações de paginação
     PAGINATION: {
         DEFAULT_PAGE_SIZE: 50,
         MAX_PAGE_SIZE: 200
     },
-    
+
     // Configurações de gráficos
     CHARTS: {
         COLORS: {
@@ -51,7 +51,7 @@ const AppConfig = {
         ANIMATION_DURATION: 1000,
         RESPONSIVE_BREAKPOINTS: [400, 600, 800, 1000]
     },
-    
+
     // Configurações de exportação
     EXPORT: {
         PDF: {
@@ -64,13 +64,13 @@ const AppConfig = {
             FORMAT: 'png'
         }
     },
-    
+
     // Configurações de notificações
     NOTIFICATIONS: {
         AUTO_HIDE_DELAY: 5000,
         MAX_VISIBLE: 3
     },
-    
+
     // Limites da aplicação
     LIMITS: {
         MAX_FILE_SIZE: 10 * 1024 * 1024,      // 10MB
@@ -78,7 +78,7 @@ const AppConfig = {
         MAX_SHEETS_PER_PROJECT: 10,
         MAX_DATA_POINTS: 10000
     },
-    
+
     // Recursos experimentais (feature flags)
     FEATURES: {
         AI_INSIGHTS: true,           // Usa machine learning do Python
@@ -193,7 +193,7 @@ const MetricsConfig = {
             ]
         }
     },
-    
+
     // Thresholds para insights
     THRESHOLDS: {
         EXCELLENT: 80,
@@ -202,7 +202,7 @@ const MetricsConfig = {
         POOR: 20,
         CRITICAL: 10
     },
-    
+
     // Unidades de medida
     UNITS: {
         PERCENTAGE: '%',
@@ -238,7 +238,7 @@ const ThemeConfig = {
         '--success-color': '#0f9d58',
         '--success-light': '#e6f4ea'
     },
-    
+
     DARK: {
         '--bg-primary': '#202124',
         '--bg-secondary': '#292a2d',
@@ -260,7 +260,7 @@ const ThemeConfig = {
         '--success-color': '#81c995',
         '--success-light': '#1e3e2f'
     },
-    
+
     // Temas customizados podem ser adicionados aqui
     BLUE: {
         '--bg-primary': '#f0f8ff',
@@ -289,9 +289,9 @@ const ThemeConfig = {
  */
 const LocaleConfig = {
     DEFAULT: 'pt-BR',
-    
+
     SUPPORTED: ['pt-BR', 'en-US', 'es-ES'],
-    
+
     TRANSLATIONS: {
         'pt-BR': {
             // Auth
@@ -303,7 +303,7 @@ const LocaleConfig = {
             'name': 'Nome',
             'remember_me': 'Lembrar-me',
             'forgot_password': 'Esqueci a senha',
-            
+
             // Projects
             'projects': 'Projetos',
             'create_project': 'Criar Projeto',
@@ -311,7 +311,7 @@ const LocaleConfig = {
             'categories': 'Categorias',
             'spreadsheet_url': 'URL da Planilha',
             'spreadsheet_id': 'ID da Planilha',
-            
+
             // Dashboard
             'dashboard': 'Dashboard',
             'filters': 'Filtros',
@@ -321,7 +321,7 @@ const LocaleConfig = {
             'share': 'Compartilhar',
             'presentation': 'Apresentação',
             'refresh': 'Atualizar',
-            
+
             // Insights
             'insights': 'Insights',
             'analysis': 'Análise',
@@ -331,7 +331,7 @@ const LocaleConfig = {
             'success': 'Sucesso',
             'ai_insights': 'Insights de IA',
             'predictions': 'Previsões',
-            
+
             // Common
             'save': 'Salvar',
             'cancel': 'Cancelar',
@@ -344,7 +344,7 @@ const LocaleConfig = {
             'warning': 'Atenção',
             'close': 'Fechar'
         },
-        
+
         'en-US': {
             // Auth
             'login': 'Login',
@@ -355,7 +355,7 @@ const LocaleConfig = {
             'name': 'Name',
             'remember_me': 'Remember me',
             'forgot_password': 'Forgot password',
-            
+
             // Projects
             'projects': 'Projects',
             'create_project': 'Create Project',
@@ -363,7 +363,7 @@ const LocaleConfig = {
             'categories': 'Categories',
             'spreadsheet_url': 'Spreadsheet URL',
             'spreadsheet_id': 'Spreadsheet ID',
-            
+
             // Dashboard
             'dashboard': 'Dashboard',
             'filters': 'Filters',
@@ -373,7 +373,7 @@ const LocaleConfig = {
             'share': 'Share',
             'presentation': 'Presentation',
             'refresh': 'Refresh',
-            
+
             // Insights
             'insights': 'Insights',
             'analysis': 'Analysis',
@@ -383,7 +383,7 @@ const LocaleConfig = {
             'success': 'Success',
             'ai_insights': 'AI Insights',
             'predictions': 'Predictions',
-            
+
             // Common
             'save': 'Save',
             'cancel': 'Cancel',
@@ -413,30 +413,30 @@ const ErrorConfig = {
         AUTH_NETWORK_ERROR: 'auth/network-error',
         AUTH_TOKEN_EXPIRED: 'auth/token-expired',
         AUTH_TOKEN_INVALID: 'auth/token-invalid',
-        
+
         // API errors
         API_CONNECTION_ERROR: 'api/connection-error',
         API_TIMEOUT: 'api/timeout',
         API_SERVER_ERROR: 'api/server-error',
-        
+
         // Data errors
         DATA_FETCH_FAILED: 'data/fetch-failed',
         DATA_PARSE_ERROR: 'data/parse-error',
         DATA_VALIDATION_ERROR: 'data/validation-error',
         DATA_NOT_FOUND: 'data/not-found',
-        
+
         // Google Sheets errors
         SHEETS_INVALID_URL: 'sheets/invalid-url',
         SHEETS_ACCESS_DENIED: 'sheets/access-denied',
         SHEETS_NOT_FOUND: 'sheets/not-found',
         SHEETS_PARSE_ERROR: 'sheets/parse-error',
-        
+
         // Export errors
         EXPORT_GENERATION_FAILED: 'export/generation-failed',
         EXPORT_NO_DATA: 'export/no-data',
         EXPORT_SIZE_LIMIT: 'export/size-limit'
     },
-    
+
     MESSAGES: {
         'pt-BR': {
             'auth/invalid-email': 'E-mail inválido.',
@@ -447,28 +447,28 @@ const ErrorConfig = {
             'auth/network-error': 'Erro de conexão. Verifique sua internet.',
             'auth/token-expired': 'Sessão expirada. Faça login novamente.',
             'auth/token-invalid': 'Token inválido. Faça login novamente.',
-            
+
             'api/connection-error': 'Não foi possível conectar ao servidor.',
             'api/timeout': 'Tempo de conexão esgotado.',
             'api/server-error': 'Erro interno do servidor.',
-            
+
             'data/fetch-failed': 'Erro ao carregar dados.',
             'data/parse-error': 'Erro ao processar dados.',
             'data/validation-error': 'Dados inválidos.',
             'data/not-found': 'Nenhum dado encontrado.',
-            
+
             'sheets/invalid-url': 'URL da planilha inválida.',
             'sheets/access-denied': 'Acesso à planilha negado.',
             'sheets/not-found': 'Planilha não encontrada.',
             'sheets/parse-error': 'Erro ao ler planilha.',
-            
+
             'export/generation-failed': 'Erro ao gerar arquivo.',
             'export/no-data': 'Nenhum dado para exportar.',
             'export/size-limit': 'Arquivo muito grande para exportar.',
-            
+
             'default': 'Ocorreu um erro. Tente novamente.'
         },
-        
+
         'en-US': {
             'auth/invalid-email': 'Invalid email address.',
             'auth/user-disabled': 'This account has been disabled.',
@@ -478,25 +478,25 @@ const ErrorConfig = {
             'auth/network-error': 'Network error. Check your connection.',
             'auth/token-expired': 'Session expired. Please login again.',
             'auth/token-invalid': 'Invalid token. Please login again.',
-            
+
             'api/connection-error': 'Could not connect to server.',
             'api/timeout': 'Connection timeout.',
             'api/server-error': 'Internal server error.',
-            
+
             'data/fetch-failed': 'Failed to load data.',
             'data/parse-error': 'Error processing data.',
             'data/validation-error': 'Invalid data.',
             'data/not-found': 'No data found.',
-            
+
             'sheets/invalid-url': 'Invalid spreadsheet URL.',
             'sheets/access-denied': 'Access to spreadsheet denied.',
             'sheets/not-found': 'Spreadsheet not found.',
             'sheets/parse-error': 'Error reading spreadsheet.',
-            
+
             'export/generation-failed': 'Error generating file.',
             'export/no-data': 'No data to export.',
             'export/size-limit': 'File too large to export.',
-            
+
             'default': 'An error occurred. Please try again.'
         }
     }
@@ -508,7 +508,7 @@ const ErrorConfig = {
 const PerformanceConfig = {
     // Níveis de log
     LOG_LEVEL: AppConfig.ENVIRONMENT === 'production' ? 'ERROR' : 'DEBUG',
-    
+
     // Métricas a serem coletadas
     METRICS: {
         PAGE_LOAD: true,
@@ -516,7 +516,7 @@ const PerformanceConfig = {
         CHART_RENDER_TIME: true,
         USER_INTERACTIONS: true
     },
-    
+
     // Limites de performance
     THRESHOLDS: {
         PAGE_LOAD: 3000,       // 3 segundos
@@ -534,7 +534,7 @@ const SecurityConfig = {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
     },
-    
+
     // Configurações de JWT
     JWT: {
         EXPIRY: 24 * 60 * 60, // 24 horas em segundos
@@ -542,7 +542,7 @@ const SecurityConfig = {
         STORAGE_KEY: 'dashmaster_token',
         REFRESH_STORAGE_KEY: 'dashmaster_refresh_token'
     },
-    
+
     // Validações de entrada
     VALIDATION: {
         PASSWORD_MIN_LENGTH: 6,
@@ -556,7 +556,7 @@ const SecurityConfig = {
         NAME_MIN_LENGTH: 2,
         NAME_MAX_LENGTH: 100
     },
-    
+
     // Configurações de CSRF (se necessário)
     CSRF: {
         ENABLED: false,
@@ -578,20 +578,20 @@ const ApiConfig = {
             PROFILE: '/auth/profile',       // Endpoint para perfil
             GOOGLE: '/auth/google'          // Endpoint para autenticação Google
         },
-        PROJECTS: { 
+        PROJECTS: {
             LIST: '/projects',              // Endpoint simplificado
             CREATE: '/projects',            // Mesmo endpoint para criação
             GET: '/projects/{id}',          // Endpoint com parâmetro
             UPDATE: '/projects/{id}',       // Atualização
             DELETE: '/projects/{id}'        // Exclusão
         },
-        DASHBOARD: { 
+        DASHBOARD: {
             DATA: '/process-data'           // Simplificado para bater com o dashboard_router.py
         },
-        EXPORT: { 
-            PDF: '/export/pdf', 
-            EXCEL: '/export/excel', 
-            CSV: '/export/csv' 
+        EXPORT: {
+            PDF: '/export/pdf',
+            EXCEL: '/export/excel',
+            CSV: '/export/csv'
         },
         ANALYTICS: {
             SENTIMENT: '/analytics/sentiment',
@@ -599,14 +599,14 @@ const ApiConfig = {
             FORECAST: '/analytics/forecast'
         }
     },
-    
+
     // Parâmetros padrão
     PARAMS: {
         PERIODS: ['day', 'week', 'month', 'quarter', 'year'],
         DEFAULT_PERIOD: 'month',
         CHART_TYPES: ['line', 'bar', 'pie', 'doughnut', 'radar']
     },
-    
+
     // WebSocket para atualizações em tempo real
     WEBSOCKET: {
         ENABLED: true,
@@ -628,31 +628,31 @@ class ConfigManager {
         this.performance = PerformanceConfig;
         this.security = SecurityConfig;
         this.api = ApiConfig; // Certifique-se de atribuir isso
-        
+
         this.currentLocale = this.getBrowserLocale();
         this.currentTheme = this.getSavedTheme();
         this.currentEnvironment = this.getEnvironment();
     }
-    
+
     /**
      * Obtém a localização do navegador
      */
     getBrowserLocale() {
         const browserLocale = navigator.language || navigator.userLanguage;
         const supportedLocales = this.locale.SUPPORTED;
-        
+
         // Verifica se a localização do navegador é suportada
         if (supportedLocales.includes(browserLocale)) {
             return browserLocale;
         }
-        
+
         // Tenta encontrar uma correspondência aproximada (ex: pt-BR para pt)
         const language = browserLocale.split('-')[0];
         const matchingLocale = supportedLocales.find(loc => loc.startsWith(language));
-        
+
         return matchingLocale || this.locale.DEFAULT;
     }
-    
+
     /**
      * Obtém o tema salvo
      */
@@ -660,13 +660,13 @@ class ConfigManager {
         const savedTheme = localStorage.getItem('theme');
         return savedTheme || 'light';
     }
-    
+
     /**
      * Obtém configurações baseadas no ambiente
      */
     getEnvironment() {
         const env = this.config.ENVIRONMENT;
-        
+
         // CORREÇÃO: Adicionado /api na URL de desenvolvimento
         const envConfigs = {
             development: {
@@ -685,10 +685,10 @@ class ConfigManager {
                 logLevel: 'ERROR'
             }
         };
-        
+
         return envConfigs[env] || envConfigs.development;
     }
-    
+
     /**
      * Obtém URL completa da API
      */
@@ -699,66 +699,66 @@ class ConfigManager {
         const end = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
         return `${baseUrl}${end}`;
     }
-    
+
     /**
      * Obtém uma tradução
      */
     t(key, locale = null) {
         const loc = locale || this.currentLocale;
         const translations = this.locale.TRANSLATIONS[loc];
-        
+
         if (translations && translations[key]) {
             return translations[key];
         }
-        
+
         // Fallback para inglês
         const englishTranslations = this.locale.TRANSLATIONS['en-US'];
         if (englishTranslations && englishTranslations[key]) {
             return englishTranslations[key];
         }
-        
+
         return key;
     }
-    
+
     /**
      * Obtém uma mensagem de erro
      */
     getErrorMessage(code, locale = null) {
         const loc = locale || this.currentLocale;
         const messages = this.errors.MESSAGES[loc];
-        
+
         if (messages && messages[code]) {
             return messages[code];
         }
-        
+
         return messages ? messages['default'] : 'An error occurred';
     }
-    
+
     /**
      * Aplica um tema
      */
     applyTheme(themeName) {
         const theme = this.themes[themeName.toUpperCase()];
-        
+
         if (!theme) {
             console.warn(`Tema ${themeName} não encontrado`);
             return;
         }
-        
+
         // Aplica as variáveis CSS
         Object.entries(theme).forEach(([property, value]) => {
             document.documentElement.style.setProperty(property, value);
         });
-        
+
         // Salva a preferência
         localStorage.setItem('theme', themeName);
         this.currentTheme = themeName;
-        
+
         // Dispara evento de mudança de tema
         document.documentElement.setAttribute('data-theme', themeName);
         window.dispatchEvent(new CustomEvent('themechange', { detail: { theme: themeName } }));
     }
-    
+
     /**
      * Obtém configuração de categoria
      */
@@ -769,29 +769,29 @@ class ConfigManager {
             color: '#666666'
         };
     }
-    
+
     /**
      * Verifica se uma feature está habilitada
      */
     isFeatureEnabled(feature) {
         return this.config.FEATURES[feature] || false;
     }
-    
+
     /**
      * Obtém configurações de ambiente
      */
     isDevelopment() {
         return this.config.ENVIRONMENT === 'development';
     }
-    
+
     isProduction() {
         return this.config.ENVIRONMENT === 'production';
     }
-    
+
     isStaging() {
         return this.config.ENVIRONMENT === 'staging';
     }
-    
+
     /**
      * Logging baseado no ambiente
      */
@@ -802,14 +802,14 @@ class ConfigManager {
             WARN: 2,
             ERROR: 3
         };
-        
+
         const currentLevel = levels[this.performance.LOG_LEVEL] || 1;
         const messageLevel = levels[level] || 0;
-        
+
         if (messageLevel >= currentLevel) {
             const timestamp = new Date().toISOString();
             const prefix = `[${timestamp}] [${level}]`;
-            
+
             switch (level) {
                 case 'DEBUG':
                     console.debug(prefix, ...args);
@@ -828,19 +828,19 @@ class ConfigManager {
             }
         }
     }
-    
+
     /**
      * Valida uma URL de planilha do Google
      * CORREÇÃO: Agora apenas validação básica, o backend Python fará o processamento
      */
     validateGoogleSheetsUrl(url) {
         if (!url) return { valid: false, error: 'URL não informada' };
-        
+
         const patterns = [
             /^https:\/\/docs\.google\.com\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/,
             /^https:\/\/docs\.google\.com\/spreadsheets\/u\/\d+\/d\/([a-zA-Z0-9-_]+)/
         ];
-        
+
         for (const pattern of patterns) {
             const match = url.match(pattern);
             if (match) {
@@ -851,7 +851,7 @@ class ConfigManager {
                 };
             }
         }
-        
+
         // Também aceita apenas o ID da planilha
         const idPattern = /^[a-zA-Z0-9-_]+$/;
         if (idPattern.test(url)) {
@@ -861,16 +861,16 @@ class ConfigManager {
                 url: `https://docs.google.com/spreadsheets/d/${url}`
             };
         }
-        
+
         return { valid: false, error: 'URL ou ID do Google Sheets inválido' };
     }
-    
+
     /**
      * Formata número baseado na localização
      */
     formatNumber(number, type = 'default') {
         const locale = this.currentLocale;
-        
+
         const options = {
             percent: {
                 style: 'percent',
@@ -896,22 +896,22 @@ class ConfigManager {
                 maximumFractionDigits: 1
             }
         };
-        
+
         const formatOptions = options[type] || options.default;
-        
+
         try {
             return new Intl.NumberFormat(locale, formatOptions).format(number);
         } catch (error) {
             return number.toString();
         }
     }
-    
+
     /**
      * Formata data baseado na localização
      */
     formatDate(date, format = 'short') {
         const locale = this.currentLocale;
-        
+
         const options = {
             short: {
                 day: '2-digit',
@@ -941,16 +941,16 @@ class ConfigManager {
                 minute: '2-digit'
             }
         };
-        
+
         const formatOptions = options[format] || options.short;
-        
+
         try {
             return new Date(date).toLocaleDateString(locale, formatOptions);
         } catch (error) {
             return date;
         }
     }
-    
+
     /**
      * Obtém headers de autenticação
      */
@@ -959,24 +959,24 @@ class ConfigManager {
         const headers = {
             ...this.security.HEADERS
         };
-        
+
         if (token) {
             headers['Authorization'] = `Bearer ${token}`;
         }
-        
+
         return headers;
     }
-    
+
     /**
      * Verifica se o usuário está autenticado
      */
     isAuthenticated() {
         const token = localStorage.getItem(this.security.JWT.STORAGE_KEY);
         const user = localStorage.getItem('dashmaster_user');
-        
+
         return !!(token && user);
     }
-    
+
     /**
      * Obtém dados do usuário atual
      */
@@ -989,7 +989,7 @@ class ConfigManager {
             return null;
         }
     }
-    
+
     /**
      * Limpa dados de autenticação
      */
@@ -998,20 +998,20 @@ class ConfigManager {
         localStorage.removeItem(this.security.JWT.REFRESH_STORAGE_KEY);
         localStorage.removeItem('dashmaster_user');
     }
-    
+
     /**
      * Constrói URL da API com parâmetros
      */
     buildApiUrl(endpoint, params = {}) {
         let url = this.getApiUrl(endpoint);
-        
+
         // Substitui placeholders como {id}
         Object.keys(params).forEach(key => {
             if (url.includes(`{${key}}`)) {
                 url = url.replace(`{${key}}`, params[key]);
             }
         });
-        
+
         // Adiciona query parameters
         const queryParams = {};
         Object.keys(params).forEach(key => {
@@ -1019,12 +1019,12 @@ class ConfigManager {
                 queryParams[key] = params[key];
             }
         });
-        
+
         if (Object.keys(queryParams).length > 0) {
             const queryString = new URLSearchParams(queryParams).toString();
             url += `?${queryString}`;
         }
-        
+
         return url;
     }
 }
