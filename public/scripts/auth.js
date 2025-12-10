@@ -335,6 +335,7 @@ class AuthManager {
                 body: JSON.stringify({
                     email: email,
                     password: password,
+                    username: email, // Backend requer username, usamos email
                     full_name: name
                 })
             });
@@ -345,7 +346,14 @@ class AuthManager {
                 let errorMessage = 'Falha no registro';
                 try {
                     const errorData = await response.json();
-                    errorMessage = errorData.detail || errorData.message || errorMessage;
+
+                    // Tratamento para erro de validação (422) do FastAPI
+                    if (Array.isArray(errorData.detail)) {
+                        errorMessage = errorData.detail.map(err => `${err.loc.join('.')}: ${err.msg}`).join('\n');
+                    } else {
+                        errorMessage = errorData.detail || errorData.message || errorMessage;
+                    }
+
                     console.error('📝 Register error details:', errorData);
                 } catch (parseError) {
                     console.error('❌ Failed to parse register error:', parseError);
