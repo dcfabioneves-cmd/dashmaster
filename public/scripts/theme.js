@@ -4,8 +4,8 @@ class ThemeManager {
     }
 
     init() {
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        this.setTheme(savedTheme);
+        // Enforce Light Mode explicitly on startup as requested
+        this.setTheme('light');
     }
 
     setTheme(themeName) {
@@ -21,6 +21,6 @@ class ThemeManager {
     }
 }
 // Tornar global para usar no onclick do HTML
-window.toggleTheme = function() {
+window.toggleTheme = function () {
     if (window.themeManager) window.themeManager.toggleTheme();
 };
