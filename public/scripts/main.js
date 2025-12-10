@@ -41,13 +41,18 @@ let chartManager;
  */
 function initializeApp() {
     console.log('🚀 Inicializando DashMetrics v2.0.0 (Python Backend)');
-    
+
     // 1. Mapear elementos do DOM
     mapDOMElements();
 
-    // 2. Sincronizar referências dos Managers
+    // 2. Sincronizar referências dos Managers (Retry se necessário)
+    if (!window.authManager) {
+        console.warn('⚠️ AuthManager not ready, retrying in 100ms...');
+        setTimeout(initializeApp, 100);
+        return;
+    }
     syncManagers();
-    
+
     // 3. Verificar configurações
     if (!window.CONFIG) {
         console.warn('⚠️ Configuração global não carregada! Usando defaults.');
@@ -57,16 +62,16 @@ function initializeApp() {
     // 4. Verificar conexão
     checkConnection();
     setupNetworkListeners();
-    
+
     // 5. Verificar autenticação
     checkAuthentication();
-    
+
     // 6. Configurar datas e UI
     setDefaultDates();
-    
+
     // 7. Adicionar estilos modais
     addModalStyles();
-    
+
     console.log('✅ Aplicação inicializada com sucesso');
 }
 
@@ -118,7 +123,7 @@ function mapDOMElements() {
         mainDashboard: document.getElementById('main-dashboard'),
         loadingSkeleton: document.getElementById('loading-skeleton')
     };
-    
+
     console.log('✅ Elementos do DOM mapeados');
 }
 
@@ -141,14 +146,14 @@ function checkAuthentication() {
  */
 function updateUserUI() {
     if (!AppState.currentUser) return;
-    
+
     const userNameEl = document.getElementById('user-name');
     const userAvatarEl = document.getElementById('user-avatar');
-    
+
     if (userNameEl) {
         userNameEl.textContent = AppState.currentUser.name || AppState.currentUser.email;
     }
-    
+
     if (userAvatarEl) {
         userAvatarEl.textContent = (AppState.currentUser.name || 'U').charAt(0).toUpperCase();
     }
@@ -173,7 +178,7 @@ async function checkConnection() {
 function updateConnectionStatus(connected) {
     const statusEl = document.getElementById('connection-status');
     if (!statusEl) return;
-    
+
     if (connected) {
         statusEl.innerHTML = '<i class="fas fa-wifi"></i> Online';
         statusEl.className = 'connected';
@@ -192,7 +197,7 @@ function setupNetworkListeners() {
         showNotification('Conexão restaurada', 'success');
         syncPendingData();
     });
-    
+
     window.addEventListener('offline', () => {
         updateConnectionStatus(false);
         showNotification('Conexão perdida - Modo offline', 'warning');
@@ -214,20 +219,20 @@ function setDefaultDates() {
     const today = new Date();
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(today.getDate() - 30);
-    
+
     const startDateInput = document.getElementById('start-date');
     const endDateInput = document.getElementById('end-date');
-    
+
     if (startDateInput) {
         startDateInput.value = formatDateForInput(thirtyDaysAgo);
         AppState.activeFilters.startDate = thirtyDaysAgo;
     }
-    
+
     if (endDateInput) {
         endDateInput.value = formatDateForInput(today);
         AppState.activeFilters.endDate = today;
     }
-    
+
     updateDateRangeDisplay();
 }
 
@@ -237,7 +242,7 @@ function setDefaultDates() {
 function updateDateRangeDisplay() {
     const dateRangeText = document.getElementById('date-range-text');
     if (!dateRangeText) return;
-    
+
     if (AppState.activeFilters.startDate && AppState.activeFilters.endDate) {
         const start = formatDate(AppState.activeFilters.startDate);
         const end = formatDate(AppState.activeFilters.endDate);
@@ -265,26 +270,26 @@ function startAutoRefresh() {
  */
 async function refreshData() {
     if (!AppState.currentProject) return;
-    
+
     try {
         showLoading();
-        
+
         const newData = await dataManager.loadData(
             AppState.currentProject.spreadsheet_url || AppState.currentProject.spreadsheetUrl,
             AppState.currentProject.categories
         );
-        
+
         AppState.sheetData = newData.data || {};
         AppState.aiInsights = newData.ai_insights || {};
-        
+
         // Atualizar dashboard
         loadDashboard(AppState.currentCategory);
-        
+
         // Atualizar timestamp
         updateLastUpdateTime();
-        
+
         showNotification('Dados atualizados com sucesso', 'success');
-        
+
     } catch (error) {
         console.error('❌ Erro ao atualizar dados:', error);
         showNotification('Erro ao atualizar dados: ' + error.message, 'error');
@@ -299,10 +304,10 @@ async function refreshData() {
 function updateLastUpdateTime() {
     const lastUpdateEl = document.getElementById('last-update');
     if (!lastUpdateEl) return;
-    
+
     const now = new Date();
     AppState.lastUpdate = now;
-    
+
     lastUpdateEl.textContent = now.toLocaleTimeString('pt-BR', {
         hour: '2-digit',
         minute: '2-digit'
@@ -314,46 +319,46 @@ function updateLastUpdateTime() {
  */
 async function loadDashboard(category) {
     if (!AppState.currentProject) return;
-    
+
     AppState.currentCategory = category;
-    
+
     // Mostrar skeleton loading
     showSkeletonLoading();
-    
+
     try {
         // Verificar se temos dados
         const categoryData = AppState.sheetData[category];
-        
+
         if (!categoryData || categoryData.length === 0) {
             showNoDataMessage();
             return;
         }
-        
+
         // Atualizar contador de dados
         updateDataPointsCount(categoryData);
-        
+
         // Renderizar KPIs
         await renderKPICards(categoryData);
-        
+
         // Gerar insights
         await generateInsights(categoryData);
-        
+
         // Renderizar gráficos
         await renderCharts(categoryData);
-        
+
         // Renderizar tabela de dados
         renderDataTable(categoryData);
-        
+
         // Atualizar status
         updateStatusBar();
-        
+
     } catch (error) {
         console.error('❌ Erro ao carregar dashboard:', error);
         showError('Erro ao carregar dashboard: ' + error.message);
     } finally {
         // Esconder skeleton loading
         hideSkeletonLoading();
-        
+
         // Mostrar conteúdo principal
         showMainDashboard();
     }
@@ -365,17 +370,17 @@ async function loadDashboard(category) {
 async function renderKPICards(data) {
     const kpiContainer = document.getElementById('kpi-cards');
     if (!kpiContainer) return;
-    
+
     // Limpar container
     kpiContainer.innerHTML = '';
-    
+
     // Obter configurações de KPI para a categoria atual
     const kpiConfigs = getChartConfigsForCategory(AppState.currentCategory);
     if (!kpiConfigs) return;
-    
+
     // Calcular KPIs principais (primeiros 4)
     const mainKPIs = kpiConfigs.slice(0, 4);
-    
+
     mainKPIs.forEach((config, index) => {
         const kpiCard = createKPICard(config, data, index);
         kpiContainer.appendChild(kpiCard);
@@ -389,11 +394,11 @@ function createKPICard(config, data, index) {
     const card = document.createElement('div');
     card.className = 'kpi-card animate__animated animate__fadeIn';
     card.style.animationDelay = `${index * 0.1}s`;
-    
+
     // Calcular valor e tendência
     const value = calculateKPIValue(data, config.dataKey);
     const trend = calculateTrend(data, config.dataKey);
-    
+
     card.innerHTML = `
         <div class="kpi-card-inner">
             <div class="kpi-header">
@@ -415,7 +420,7 @@ function createKPICard(config, data, index) {
             </div>
         </div>
     `;
-    
+
     return card;
 }
 
@@ -424,21 +429,21 @@ function createKPICard(config, data, index) {
  */
 function calculateKPIValue(data, dataKey) {
     if (!data || data.length === 0) return 0;
-    
+
     const values = data
         .map(item => {
             let val = item[dataKey];
-            
+
             if (val === undefined && item.data) {
                 val = item.data[dataKey];
             }
-            
+
             return parseFloat(val);
         })
         .filter(v => !isNaN(v));
-    
+
     if (values.length === 0) return 0;
-    
+
     const sum = values.reduce((a, b) => a + b, 0);
     return sum / values.length;
 }
@@ -450,20 +455,20 @@ function calculateTrend(data, dataKey) {
     if (!data || data.length < 2) {
         return { type: 'neutral', value: '0%', icon: 'fa-minus' };
     }
-    
+
     const recentData = data.slice(-3);
     const previousData = data.slice(-6, -3);
-    
+
     const recentAvg = calculateKPIValue(recentData, dataKey);
     const previousAvg = calculateKPIValue(previousData, dataKey);
-    
+
     if (previousAvg === 0) {
         return { type: 'neutral', value: '0%', icon: 'fa-minus' };
     }
-    
+
     const change = ((recentAvg - previousAvg) / previousAvg) * 100;
     const absChange = Math.abs(change).toFixed(1);
-    
+
     if (change > 5) {
         return { type: 'up', value: `+${absChange}%`, icon: 'fa-arrow-up' };
     } else if (change < -5) {
@@ -478,9 +483,9 @@ function calculateTrend(data, dataKey) {
  */
 function formatKPIValue(value, dataKey) {
     const numValue = parseFloat(value);
-    
+
     if (isNaN(numValue)) return 'N/A';
-    
+
     if (dataKey.includes('Taxa') || dataKey.includes('CTR') || dataKey.includes('%')) {
         return `${numValue.toFixed(1)}%`;
     } else if (dataKey.includes('$') || dataKey.includes('R$') || dataKey.includes('Custo')) {
@@ -501,7 +506,7 @@ function formatKPIValue(value, dataKey) {
  */
 async function generateInsights(data) {
     if (!insightsManager || !data) return;
-    
+
     try {
         await insightsManager.generateInsights(AppState.currentCategory, data);
     } catch (error) {
@@ -515,7 +520,7 @@ async function generateInsights(data) {
 async function renderCharts(data) {
     const chartsGrid = document.getElementById('charts-grid');
     if (!chartsGrid) return;
-    
+
     // Limpar gráficos existentes
     if (AppState.currentCharts && Array.isArray(AppState.currentCharts)) {
         AppState.currentCharts.forEach(chart => {
@@ -525,22 +530,22 @@ async function renderCharts(data) {
         });
     }
     AppState.currentCharts = [];
-    
+
     // Limpar grid
     chartsGrid.innerHTML = '';
-    
+
     // Obter configurações de gráficos
     const chartConfigs = getChartConfigsForCategory(AppState.currentCategory);
     if (!chartConfigs || chartConfigs.length === 0) {
         chartsGrid.innerHTML = '<div class="no-charts">Nenhum gráfico configurado</div>';
         return;
     }
-    
+
     // Criar gráficos
     chartConfigs.forEach(async (config, index) => {
         const chartContainer = createChartContainer(config, index);
         chartsGrid.appendChild(chartContainer);
-        
+
         // Criar gráfico
         const chart = await createChart(config, data, `chart-${AppState.currentCategory}-${index}`);
         if (chart) {
@@ -556,7 +561,7 @@ function createChartContainer(config, index) {
     const container = document.createElement('div');
     container.className = 'chart-container animate__animated animate__fadeInUp';
     container.style.animationDelay = `${index * 0.1}s`;
-    
+
     container.innerHTML = `
         <div class="chart-header">
             <h3 class="chart-title">${config.title}</h3>
@@ -592,7 +597,7 @@ function createChartContainer(config, index) {
             </div>
         </div>
     `;
-    
+
     return container;
 }
 
@@ -601,7 +606,7 @@ function createChartContainer(config, index) {
  */
 async function createChart(config, data, canvasId) {
     if (!chartManager) return null;
-    
+
     try {
         return await chartManager.createChart(canvasId, {
             type: config.type || 'line',
@@ -621,13 +626,13 @@ function prepareChartData(data, config) {
     if (!data || data.length === 0) {
         return { labels: [], datasets: [] };
     }
-    
+
     const labels = data.map(item => item.mes || item.date || '');
     const values = data.map(item => {
         const val = item[config.dataKey] || (item.data && item.data[config.dataKey]);
         return parseFloat(val) || 0;
     });
-    
+
     return {
         labels: labels,
         datasets: [{
@@ -683,29 +688,29 @@ function renderDataTable(data) {
     const tableSection = document.getElementById('data-table-section');
     const tableBody = document.getElementById('table-body');
     const tableHeaders = document.getElementById('table-headers');
-    
+
     if (!tableSection || !tableBody || !tableHeaders) return;
-    
+
     if (!data || data.length === 0) {
         tableSection.style.display = 'none';
         return;
     }
-    
+
     tableSection.style.display = 'block';
     tableHeaders.innerHTML = '';
     tableBody.innerHTML = '';
-    
+
     // Obter cabeçalhos dinamicamente do primeiro item
     const firstRow = data[0];
     const sourceObj = firstRow.data || firstRow;
-    
+
     const headers = Object.keys(sourceObj).filter(k => k !== 'mes_ano' && k !== 'date' && k !== 'id');
-    
+
     // 1. Cabeçalho de Mês/Data
     const monthHeader = document.createElement('th');
     monthHeader.textContent = 'Período';
     tableHeaders.appendChild(monthHeader);
-    
+
     // 2. Outros cabeçalhos
     headers.forEach(header => {
         if (header !== 'Mês' && header !== 'mes') {
@@ -714,29 +719,29 @@ function renderDataTable(data) {
             tableHeaders.appendChild(th);
         }
     });
-    
+
     // Linhas
     data.forEach((row, rowIndex) => {
         const tr = document.createElement('tr');
         const rowSource = row.data || row;
-        
+
         // Célula de Mês
         const monthCell = document.createElement('td');
         monthCell.textContent = row.mes || row.Mês || row.mes_ano || row.date || `Período ${rowIndex + 1}`;
         monthCell.className = 'month-cell';
         tr.appendChild(monthCell);
-        
+
         // Células de Dados
         headers.forEach(header => {
             if (header !== 'Mês' && header !== 'mes') {
                 const td = document.createElement('td');
                 const value = rowSource[header];
-                
+
                 if (typeof value === 'number') {
                     let formatted = value.toFixed(1);
-                    if(header.includes('taxa') || header.includes('rate') || header.includes('porcentagem')) formatted += '%';
-                    else if(header.includes('valor') || header.includes('custo') || header.includes('reais')) formatted = 'R$ ' + formatted;
-                    
+                    if (header.includes('taxa') || header.includes('rate') || header.includes('porcentagem')) formatted += '%';
+                    else if (header.includes('valor') || header.includes('custo') || header.includes('reais')) formatted = 'R$ ' + formatted;
+
                     td.textContent = formatted;
                     td.className = 'number-cell';
                 } else {
@@ -755,16 +760,16 @@ function renderDataTable(data) {
 function updateStatusBar() {
     const dataPointsEl = document.getElementById('data-points');
     const alertsCountEl = document.getElementById('alerts-count');
-    
+
     if (dataPointsEl) {
         const currentData = AppState.sheetData[AppState.currentCategory] || [];
         dataPointsEl.textContent = currentData.length;
     }
-    
+
     if (alertsCountEl) {
         const insights = document.querySelectorAll('.insight-card.danger, .insight-card.warning');
         const alertCount = insights.length;
-        
+
         alertsCountEl.textContent = alertCount;
         alertsCountEl.className = alertCount > 0 ? 'has-alerts' : 'no-alerts';
     }
@@ -788,7 +793,7 @@ function showProjectManager() {
     if (DOM.projectManager) {
         DOM.projectManager.style.display = 'block';
     }
-    
+
     // Carregar projetos
     if (projectManager && AppState.currentUser) {
         if (typeof projectManager.loadUserProjects === 'function') {
@@ -867,7 +872,7 @@ function hideAllScreens() {
 function showError(message) {
     const dashboard = document.getElementById('dashboard');
     if (!dashboard) return;
-    
+
     dashboard.innerHTML = `
         <div class="error-state">
             <div class="error-icon">
@@ -888,7 +893,7 @@ function showError(message) {
 function showNoDataMessage() {
     const dashboard = document.getElementById('dashboard');
     if (!dashboard) return;
-    
+
     dashboard.innerHTML = `
         <div class="empty-state">
             <div class="empty-icon">
@@ -925,17 +930,17 @@ function hideLoading() {
 function showNotification(message, type = 'info') {
     const container = document.getElementById('notification-container');
     if (!container) return;
-    
+
     const notification = document.createElement('div');
     notification.className = `notification notification-${type} animate__animated animate__slideInRight`;
-    
+
     const icons = {
         success: 'fa-check-circle',
         error: 'fa-times-circle',
         warning: 'fa-exclamation-triangle',
         info: 'fa-info-circle'
     };
-    
+
     notification.innerHTML = `
         <div class="notification-icon">
             <i class="fas ${icons[type] || 'fa-info-circle'}"></i>
@@ -945,9 +950,9 @@ function showNotification(message, type = 'info') {
             <i class="fas fa-times"></i>
         </button>
     `;
-    
+
     container.appendChild(notification);
-    
+
     // Remover automaticamente após 5 segundos
     setTimeout(() => {
         if (notification.parentElement) {
@@ -986,7 +991,7 @@ function formatDate(date) {
  */
 function formatTableValue(value, header) {
     if (typeof value !== 'number') return value;
-    
+
     if (header.includes('Taxa') || header.includes('CTR') || header.includes('%')) {
         return value.toFixed(1) + '%';
     } else if (header.includes('R$') || header.includes('Custo')) {
@@ -1012,7 +1017,7 @@ function getMetricDescription(metric) {
         'CPC': 'Custo por Clique',
         'CPA': 'Custo por Aquisição',
     };
-    
+
     return descriptions[metric] || metric;
 }
 
@@ -1028,7 +1033,7 @@ function getKPIDescription(metric) {
         'Alcance': 'Pessoas alcançadas',
         'Engajamento': 'Interações com conteúdo',
     };
-    
+
     return descriptions[metric] || 'Métrica de performance';
 }
 
@@ -1050,7 +1055,7 @@ function getChartConfigsForCategory(category) {
             { title: 'Taxa ROAS', type: 'bar', dataKey: 'taxa_roas', id: 'social-roas' }
         ]
     };
-    
+
     return configs[category] || [];
 }
 
@@ -1070,26 +1075,26 @@ function updateDataPointsCount(data) {
 document.addEventListener('DOMContentLoaded', initializeApp);
 
 // Prevenir comportamento padrão de forms
-document.addEventListener('submit', function(e) {
+document.addEventListener('submit', function (e) {
     if (e.target.tagName === 'FORM') {
         e.preventDefault();
     }
 });
 
 // Atalhos de teclado
-document.addEventListener('keydown', function(e) {
+document.addEventListener('keydown', function (e) {
     // Ctrl + S para salvar
     if (e.ctrlKey && e.key === 's') {
         e.preventDefault();
         refreshData();
     }
-    
+
     // F5 para atualizar
     if (e.key === 'F5') {
         e.preventDefault();
         refreshData();
     }
-    
+
     // Esc para sair do modo tela cheia
     if (e.key === 'Escape' && AppState.isFullscreen) {
         exitFullscreen();
@@ -1098,63 +1103,63 @@ document.addEventListener('keydown', function(e) {
 
 // ===== EXPORTAÇÃO PARA ESCOPO GLOBAL =====
 
-window.toggleChartType = function(chartId) {
+window.toggleChartType = function (chartId) {
     const chartIndex = parseInt(chartId);
     const chart = AppState.currentCharts[chartIndex];
-    
+
     if (!chart) return;
-    
+
     const newType = chart.config.type === 'line' ? 'bar' : 'line';
     chart.config.type = newType;
     chart.update();
-    
+
     showNotification(`Gráfico alterado para ${newType === 'line' ? 'linha' : 'barras'}`);
 };
 
-window.downloadChart = function(chartId) {
+window.downloadChart = function (chartId) {
     const chartIndex = parseInt(chartId);
     const chart = AppState.currentCharts[chartIndex];
-    
+
     if (!chart) {
         showNotification('Gráfico não encontrado', 'error');
         return;
     }
-    
+
     const link = document.createElement('a');
     link.download = `grafico-${AppState.currentCategory}-${chartIndex + 1}.png`;
     link.href = chart.canvas.toDataURL('image/png', 1.0);
     link.click();
-    
+
     showNotification('Gráfico baixado com sucesso', 'success');
 };
 
-window.showKPIHistory = function(metric) {
+window.showKPIHistory = function (metric) {
     showNotification(`Histórico de ${metric} será exibido em breve`, 'info');
 };
 
-window.fullscreenChart = function(chartId) {
+window.fullscreenChart = function (chartId) {
     const chartIndex = parseInt(chartId);
     const chart = AppState.currentCharts[chartIndex];
-    
+
     if (!chart) return;
-    
+
     const canvas = chart.canvas;
     if (canvas.requestFullscreen) {
         canvas.requestFullscreen();
     } else if (canvas.webkitRequestFullscreen) {
         canvas.webkitRequestFullscreen();
     }
-    
+
     AppState.isFullscreen = true;
 };
 
-window.exitFullscreen = function() {
+window.exitFullscreen = function () {
     if (document.exitFullscreen) {
         document.exitFullscreen();
     } else if (document.webkitExitFullscreen) {
         document.webkitExitFullscreen();
     }
-    
+
     AppState.isFullscreen = false;
 };
 
@@ -1341,7 +1346,7 @@ function addModalStyles() {
             to { opacity: 1; transform: translateY(0); }
         }
     `;
-    
+
     document.head.appendChild(modalStyles);
 }
 
