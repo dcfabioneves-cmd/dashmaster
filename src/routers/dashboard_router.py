@@ -16,7 +16,7 @@ class DataRequest(BaseModel):
 google_service = GoogleSheetService()
 processor = DataProcessor()
 
-@router.post("/")
+@router.post("")
 async def process_dashboard_data(request: DataRequest, current_user = Depends(get_current_user)):
     try:
         # 1. Obter dados brutos
