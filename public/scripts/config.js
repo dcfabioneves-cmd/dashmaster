@@ -610,7 +610,10 @@ const ApiConfig = {
     // WebSocket para atualizações em tempo real
     WEBSOCKET: {
         ENABLED: true,
-        URL: 'ws://localhost:8000/ws', // Ou wss:// em produção
+        get URL() {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            return `${protocol}//${window.location.host}/ws`;
+        },
         RECONNECT_DELAY: 3000
     }
 };
@@ -671,17 +674,17 @@ class ConfigManager {
         const envConfigs = {
             development: {
                 debug: true,
-                apiUrl: 'http://localhost:8000/api', // CORREÇÃO: Com /api no final
+                apiUrl: '/api', // Relative path for same-origin (localhost or Render)
                 logLevel: 'DEBUG'
             },
             staging: {
                 debug: true,
-                apiUrl: 'https://staging-api.dashmetrics.com/api',
+                apiUrl: '/api', // Relative path
                 logLevel: 'INFO'
             },
             production: {
                 debug: false,
-                apiUrl: 'https://api.dashmetrics.com/api',
+                apiUrl: '/api', // Relative path
                 logLevel: 'ERROR'
             }
         };
