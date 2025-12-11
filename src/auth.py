@@ -1,5 +1,5 @@
 # src/auth.py
-from passlib.context import CryptContext
+import bcrypt
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
 import os
@@ -7,18 +7,22 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# TROQUEI: bcrypt → argon2 (mais seguro e funciona no Render)
-pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
-
 SECRET_KEY = os.getenv("SECRET_KEY", "sua-chave-super-secreta-aqui")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
+    # Bcrypt requires bytes
+    try:
+        if isinstance(hashed_password, str):
+            hashed_password = hashed_password.encode('utf-8')
+        return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password)
+    except ValueError:
+        return False
 
 def get_password_hash(password):
-    return pwd_context.hash(password)
+    # Returns string
+    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
 def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()
