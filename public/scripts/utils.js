@@ -8,33 +8,33 @@
  */
 function formatNumber(num, type = 'default') {
     const n = parseFloat(num);
-    
+
     if (isNaN(n)) {
         return 'N/A';
     }
-    
+
     switch (type) {
         case 'percent':
             return `${n.toFixed(1)}%`;
-        
+
         case 'currency':
             return `R$ ${n.toLocaleString('pt-BR', {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2
             })}`;
-        
+
         case 'decimal':
             return n.toLocaleString('pt-BR', {
                 minimumFractionDigits: 1,
                 maximumFractionDigits: 2
             });
-        
+
         case 'integer':
             return n.toLocaleString('pt-BR', {
                 minimumFractionDigits: 0,
                 maximumFractionDigits: 0
             });
-        
+
         case 'compact':
             if (Math.abs(n) >= 1000000000) {
                 return `${(n / 1000000000).toFixed(1)}B`;
@@ -46,7 +46,7 @@ function formatNumber(num, type = 'default') {
                 return `${(n / 1000).toFixed(1)}K`;
             }
             return n.toFixed(1);
-        
+
         default:
             if (Math.abs(n) >= 1000000) {
                 return `${(n / 1000000).toFixed(1)}M`;
@@ -69,13 +69,13 @@ function formatNumber(num, type = 'default') {
  */
 function formatDate(date, format = 'short') {
     if (!date) return 'N/A';
-    
+
     const d = new Date(date);
-    
+
     if (isNaN(d.getTime())) {
         return 'Data inválida';
     }
-    
+
     const options = {
         short: {
             day: '2-digit',
@@ -105,7 +105,7 @@ function formatDate(date, format = 'short') {
             minute: '2-digit'
         }
     };
-    
+
     return d.toLocaleDateString('pt-BR', options[format] || options.short);
 }
 
@@ -116,12 +116,12 @@ function formatDate(date, format = 'short') {
  */
 function formatDateForInput(date) {
     if (!date) return '';
-    
+
     const d = new Date(date);
     const year = d.getFullYear();
     const month = String(d.getMonth() + 1).padStart(2, '0');
     const day = String(d.getDate()).padStart(2, '0');
-    
+
     return `${year}-${month}-${day}`;
 }
 
@@ -135,9 +135,9 @@ function formatDateForInput(date) {
 function dateDiff(date1, date2, unit = 'days') {
     const d1 = new Date(date1);
     const d2 = new Date(date2);
-    
+
     const diffMs = Math.abs(d2 - d1);
-    
+
     switch (unit) {
         case 'milliseconds':
             return diffMs;
@@ -195,14 +195,14 @@ function extractSheetId(url) {
         /id=([a-zA-Z0-9-_]+)/,
         /\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/
     ];
-    
+
     for (const pattern of patterns) {
         const match = url.match(pattern);
         if (match && match[1]) {
             return match[1];
         }
     }
-    
+
     return null;
 }
 
@@ -216,13 +216,13 @@ function extractSheetId(url) {
 async function fetchWithTimeout(url, options = {}, timeout = 10000) {
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), timeout);
-    
+
     try {
         const response = await fetch(url, {
             ...options,
             signal: controller.signal
         });
-        
+
         clearTimeout(id);
         return response;
     } catch (error) {
@@ -240,18 +240,18 @@ async function fetchWithTimeout(url, options = {}, timeout = 10000) {
 async function fetchJSON(url, options = {}) {
     try {
         const response = await fetchWithTimeout(url, options);
-        
+
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
-        
+
         const data = await response.json();
         return { success: true, data };
-        
+
     } catch (error) {
         console.error('Erro na requisição:', error);
-        return { 
-            success: false, 
+        return {
+            success: false,
             error: error.message,
             code: error.name === 'AbortError' ? 'TIMEOUT' : 'NETWORK_ERROR'
         };
@@ -269,7 +269,7 @@ function setWithExpiry(key, value, ttl = 3600000) {
         value: value,
         expiry: Date.now() + ttl
     };
-    
+
     try {
         localStorage.setItem(key, JSON.stringify(item));
     } catch (error) {
@@ -296,20 +296,20 @@ function setWithExpiry(key, value, ttl = 3600000) {
 function getWithExpiry(key) {
     try {
         const itemStr = localStorage.getItem(key);
-        
+
         if (!itemStr) {
             return null;
         }
-        
+
         const item = JSON.parse(itemStr);
-        
+
         if (Date.now() > item.expiry) {
             localStorage.removeItem(key);
             return null;
         }
-        
+
         return item.value;
-        
+
     } catch (error) {
         console.warn('Erro ao ler do localStorage:', error);
         return null;
@@ -321,14 +321,14 @@ function getWithExpiry(key) {
  */
 function clearExpiredItems() {
     const keys = Object.keys(localStorage);
-    
+
     for (const key of keys) {
         try {
             const itemStr = localStorage.getItem(key);
             if (!itemStr) continue;
-            
+
             const item = JSON.parse(itemStr);
-            
+
             if (item.expiry && Date.now() > item.expiry) {
                 localStorage.removeItem(key);
             }
@@ -346,13 +346,13 @@ function clearExpiredItems() {
  */
 function debounce(func, wait) {
     let timeout;
-    
+
     return function executedFunction(...args) {
         const later = () => {
             clearTimeout(timeout);
             func(...args);
         };
-        
+
         clearTimeout(timeout);
         timeout = setTimeout(later, wait);
     };
@@ -366,7 +366,7 @@ function debounce(func, wait) {
  */
 function throttle(func, limit) {
     let inThrottle;
-    
+
     return function executedFunction(...args) {
         if (!inThrottle) {
             func(...args);
@@ -385,18 +385,18 @@ function deepClone(obj) {
     if (obj === null || typeof obj !== 'object') {
         return obj;
     }
-    
+
     if (obj instanceof Date) {
         return new Date(obj.getTime());
     }
-    
+
     if (obj instanceof Array) {
         return obj.reduce((arr, item, i) => {
             arr[i] = deepClone(item);
             return arr;
         }, []);
     }
-    
+
     if (typeof obj === 'object') {
         return Object.keys(obj).reduce((newObj, key) => {
             newObj[key] = deepClone(obj[key]);
@@ -413,7 +413,7 @@ function deepClone(obj) {
  */
 function deepMerge(target, source) {
     const output = Object.assign({}, target);
-    
+
     if (isObject(target) && isObject(source)) {
         Object.keys(source).forEach(key => {
             if (isObject(source[key])) {
@@ -427,7 +427,7 @@ function deepMerge(target, source) {
             }
         });
     }
-    
+
     return output;
 }
 
@@ -448,13 +448,13 @@ function isObject(item) {
  */
 function formatBytes(bytes, decimals = 2) {
     if (bytes === 0) return '0 Bytes';
-    
+
     const k = 1024;
     const dm = decimals < 0 ? 0 : decimals;
     const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-    
+
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    
+
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
 
@@ -466,11 +466,11 @@ function formatBytes(bytes, decimals = 2) {
 function generateId(length = 8) {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let result = '';
-    
+
     for (let i = 0; i < length; i++) {
         result += chars.charAt(Math.floor(Math.random() * chars.length));
     }
-    
+
     return result;
 }
 
@@ -515,10 +515,10 @@ function queryStringToObject(queryString) {
  */
 function calculateAverage(arr) {
     if (!arr || arr.length === 0) return 0;
-    
+
     const validNumbers = arr.filter(n => typeof n === 'number' && !isNaN(n));
     if (validNumbers.length === 0) return 0;
-    
+
     const sum = validNumbers.reduce((a, b) => a + b, 0);
     return sum / validNumbers.length;
 }
@@ -530,15 +530,15 @@ function calculateAverage(arr) {
  */
 function calculateMedian(arr) {
     if (!arr || arr.length === 0) return 0;
-    
+
     const validNumbers = arr
         .filter(n => typeof n === 'number' && !isNaN(n))
         .sort((a, b) => a - b);
-    
+
     if (validNumbers.length === 0) return 0;
-    
+
     const middle = Math.floor(validNumbers.length / 2);
-    
+
     if (validNumbers.length % 2 === 0) {
         return (validNumbers[middle - 1] + validNumbers[middle]) / 2;
     } else {
@@ -553,14 +553,14 @@ function calculateMedian(arr) {
  */
 function calculateStandardDeviation(arr) {
     if (!arr || arr.length === 0) return 0;
-    
+
     const validNumbers = arr.filter(n => typeof n === 'number' && !isNaN(n));
     if (validNumbers.length < 2) return 0;
-    
+
     const avg = calculateAverage(validNumbers);
     const squareDiffs = validNumbers.map(n => Math.pow(n - avg, 2));
     const avgSquareDiff = calculateAverage(squareDiffs);
-    
+
     return Math.sqrt(avgSquareDiff);
 }
 
@@ -571,27 +571,27 @@ function calculateStandardDeviation(arr) {
  */
 function formatDuration(ms) {
     if (ms < 1000) return `${ms}ms`;
-    
+
     const seconds = Math.floor(ms / 1000);
     if (seconds < 60) return `${seconds}s`;
-    
+
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
-    
+
     if (minutes < 60) {
         return `${minutes}m ${remainingSeconds}s`;
     }
-    
+
     const hours = Math.floor(minutes / 60);
     const remainingMinutes = minutes % 60;
-    
+
     if (hours < 24) {
         return `${hours}h ${remainingMinutes}m`;
     }
-    
+
     const days = Math.floor(hours / 24);
     const remainingHours = hours % 24;
-    
+
     return `${days}d ${remainingHours}h`;
 }
 
@@ -696,7 +696,7 @@ function createElementFromHTML(html) {
  */
 function addAutoRemoveEventListener(element, event, handler) {
     element.addEventListener(event, handler);
-    
+
     return () => {
         element.removeEventListener(event, handler);
     };
@@ -712,30 +712,30 @@ function createTooltip(element, text, position = 'top') {
     const tooltip = document.createElement('div');
     tooltip.className = `tooltip tooltip-${position}`;
     tooltip.textContent = text;
-    
+
     element.style.position = 'relative';
-    
+
     const showTooltip = () => {
         element.appendChild(tooltip);
         tooltip.classList.add('show');
     };
-    
+
     const hideTooltip = () => {
         if (tooltip.parentElement === element) {
             element.removeChild(tooltip);
         }
     };
-    
+
     element.addEventListener('mouseenter', showTooltip);
     element.addEventListener('mouseleave', hideTooltip);
     element.addEventListener('focus', showTooltip);
     element.addEventListener('blur', hideTooltip);
-    
+
     // Para touch devices
     element.addEventListener('touchstart', (e) => {
         e.preventDefault();
         showTooltip();
-        
+
         // Esconde após 2 segundos
         setTimeout(hideTooltip, 2000);
     });
@@ -749,7 +749,7 @@ function createTooltip(element, text, position = 'top') {
  */
 function isElementInViewport(element, offset = 0) {
     const rect = element.getBoundingClientRect();
-    
+
     return (
         rect.top >= 0 &&
         rect.left >= 0 &&
@@ -770,12 +770,12 @@ function scrollToElement(element, options = {}) {
         inline: 'nearest',
         offset: 0
     };
-    
+
     const mergedOptions = { ...defaultOptions, ...options };
-    
+
     const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
     const offsetPosition = elementPosition - mergedOptions.offset;
-    
+
     window.scrollTo({
         top: offsetPosition,
         behavior: mergedOptions.behavior
@@ -792,7 +792,7 @@ function measurePerformance(fn, ...args) {
     const start = performance.now();
     const result = fn(...args);
     const end = performance.now();
-    
+
     return {
         result,
         executionTime: end - start
@@ -809,7 +809,7 @@ function exportAsFile(data, filename, type = 'text/plain') {
     const blob = new Blob([data], { type });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    
+
     a.href = url;
     a.download = filename;
     document.body.appendChild(a);
@@ -828,19 +828,19 @@ function csvToJSON(csv, delimiter = ',') {
     const lines = csv.split('\n');
     const result = [];
     const headers = lines[0].split(delimiter);
-    
+
     for (let i = 1; i < lines.length; i++) {
         if (!lines[i].trim()) continue;
-        
+
         const obj = {};
         const currentline = lines[i].split(delimiter);
-        
+
         for (let j = 0; j < headers.length; j++) {
             let value = currentline[j] || '';
-            
+
             // Remove aspas se existirem
             value = value.replace(/^"|"$/g, '');
-            
+
             // Tenta converter para número
             if (!isNaN(value) && value.trim() !== '') {
                 obj[headers[j]] = parseFloat(value);
@@ -848,10 +848,10 @@ function csvToJSON(csv, delimiter = ',') {
                 obj[headers[j]] = value;
             }
         }
-        
+
         result.push(obj);
     }
-    
+
     return result;
 }
 
@@ -863,34 +863,34 @@ function csvToJSON(csv, delimiter = ',') {
  */
 function jsonToCSV(data, delimiter = ',') {
     if (!data || data.length === 0) return '';
-    
+
     const headers = Object.keys(data[0]);
     const csvRows = [];
-    
+
     // Headers
     csvRows.push(headers.join(delimiter));
-    
+
     // Rows
     for (const row of data) {
         const values = headers.map(header => {
             const value = row[header];
-            
+
             if (value === null || value === undefined) {
                 return '';
             }
-            
+
             // Adiciona aspas se o valor contiver o delimitador ou aspas
             const stringValue = String(value);
             if (stringValue.includes(delimiter) || stringValue.includes('"')) {
                 return `"${stringValue.replace(/"/g, '""')}"`;
             }
-            
+
             return stringValue;
         });
-        
+
         csvRows.push(values.join(delimiter));
     }
-    
+
     return csvRows.join('\n');
 }
 
@@ -910,7 +910,7 @@ function removeAccents(str) {
  */
 function formatCpfCnpj(value) {
     const cleaned = value.replace(/\D/g, '');
-    
+
     if (cleaned.length <= 11) {
         // CPF
         return cleaned.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
@@ -927,7 +927,7 @@ function formatCpfCnpj(value) {
  */
 function formatPhone(value) {
     const cleaned = value.replace(/\D/g, '');
-    
+
     if (cleaned.length === 11) {
         return cleaned.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
     } else if (cleaned.length === 10) {
@@ -944,31 +944,31 @@ function formatPhone(value) {
  */
 function validateCPF(cpf) {
     cpf = cpf.replace(/\D/g, '');
-    
+
     if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) {
         return false;
     }
-    
+
     let sum = 0;
     let remainder;
-    
+
     for (let i = 1; i <= 9; i++) {
         sum += parseInt(cpf.substring(i - 1, i)) * (11 - i);
     }
-    
+
     remainder = (sum * 10) % 11;
     if (remainder === 10 || remainder === 11) remainder = 0;
     if (remainder !== parseInt(cpf.substring(9, 10))) return false;
-    
+
     sum = 0;
     for (let i = 1; i <= 10; i++) {
         sum += parseInt(cpf.substring(i - 1, i)) * (12 - i);
     }
-    
+
     remainder = (sum * 10) % 11;
     if (remainder === 10 || remainder === 11) remainder = 0;
     if (remainder !== parseInt(cpf.substring(10, 11))) return false;
-    
+
     return true;
 }
 
@@ -979,38 +979,38 @@ function validateCPF(cpf) {
  */
 function validateCNPJ(cnpj) {
     cnpj = cnpj.replace(/\D/g, '');
-    
+
     if (cnpj.length !== 14 || /^(\d)\1{13}$/.test(cnpj)) {
         return false;
     }
-    
+
     let size = cnpj.length - 2;
     let numbers = cnpj.substring(0, size);
     const digits = cnpj.substring(size);
     let sum = 0;
     let pos = size - 7;
-    
+
     for (let i = size; i >= 1; i--) {
         sum += numbers.charAt(size - i) * pos--;
         if (pos < 2) pos = 9;
     }
-    
+
     let result = sum % 11 < 2 ? 0 : 11 - sum % 11;
     if (result !== parseInt(digits.charAt(0))) return false;
-    
+
     size = size + 1;
     numbers = cnpj.substring(0, size);
     sum = 0;
     pos = size - 7;
-    
+
     for (let i = size; i >= 1; i--) {
         sum += numbers.charAt(size - i) * pos--;
         if (pos < 2) pos = 9;
     }
-    
+
     result = sum % 11 < 2 ? 0 : 11 - sum % 11;
     if (result !== parseInt(digits.charAt(1))) return false;
-    
+
     return true;
 }
 
@@ -1024,31 +1024,31 @@ const logger = {
         WARN: 2,
         ERROR: 3
     },
-    
+
     currentLevel: 1, // INFO por padrão
-    
+
     setLevel(level) {
         this.currentLevel = level;
     },
-    
+
     debug(...args) {
         if (this.currentLevel <= this.levels.DEBUG) {
             console.debug('[DEBUG]', ...args);
         }
     },
-    
+
     info(...args) {
         if (this.currentLevel <= this.levels.INFO) {
             console.info('[INFO]', ...args);
         }
     },
-    
+
     warn(...args) {
         if (this.currentLevel <= this.levels.WARN) {
             console.warn('[WARN]', ...args);
         }
     },
-    
+
     error(...args) {
         if (this.currentLevel <= this.levels.ERROR) {
             console.error('[ERROR]', ...args);
@@ -1056,53 +1056,25 @@ const logger = {
     }
 };
 
-// ===== EXPORTAÇÃO =====
-// Torna todas as funções disponíveis globalmente
-window.utils = {
-    formatNumber,
-    formatDate,
-    formatDateForInput,
-    dateDiff,
-    isValidEmail,
-    isValidUrl,
-    extractSheetId,
-    fetchWithTimeout,
-    fetchJSON,
-    setWithExpiry,
-    getWithExpiry,
-    clearExpiredItems,
-    debounce,
-    throttle,
-    deepClone,
-    deepMerge,
-    isObject,
-    formatBytes,
-    generateId,
-    objectToQueryString,
-    queryStringToObject,
-    calculateAverage,
-    calculateMedian,
-    calculateStandardDeviation,
-    formatDuration,
-    sleep,
-    isMobileDevice,
-    isTouchDevice,
-    copyToClipboard,
-    readFromClipboard,
-    sanitizeHTML,
-    createElementFromHTML,
-    addAutoRemoveEventListener,
-    createTooltip,
-    isElementInViewport,
-    scrollToElement,
-    measurePerformance,
-    exportAsFile,
-    csvToJSON,
-    jsonToCSV,
-    removeAccents,
-    formatCpfCnpj,
-    formatPhone,
-    validateCPF,
-    validateCNPJ,
-    logger
-};
+
+
+
+
+/**
+ * Retorna o nome legível da categoria
+ * @param {string} category - Código da categoria
+ * @returns {string} Nome legível
+ */
+function getCategoryName(category) {
+    const categories = {
+        'email': 'E-mail Marketing',
+        'social': 'Redes Sociais',
+        'seo': 'SEO',
+        'ecommerce': 'E-commerce',
+        'google-ads': 'Google Ads',
+        'meta-ads': 'Meta Ads',
+        'blog': 'Blog'
+    };
+    return categories[category] || category;
+}
+window.getCategoryName = getCategoryName;
