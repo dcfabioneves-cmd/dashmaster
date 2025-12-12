@@ -7,8 +7,21 @@ class DataProcessor:
 
         df = pd.DataFrame(raw_data)
         
-        # Normalização básica de nomes de colunas
-        df.columns = [c.lower().replace(' ', '_') for c in df.columns]
+        # Normalização de nomes de colunas
+        def normalize_col(col):
+            import unicodedata
+            # Remove acentos
+            nfkd_form = unicodedata.normalize('NFKD', col)
+            col_ascii = "".join([c for c in nfkd_form if not unicodedata.combining(c)])
+            # Lowercase
+            col_clean = col_ascii.lower()
+            # Remove preposições comuns para padronizar chaves
+            for ignore in [' de ', ' do ', ' da ', ' dos ', ' das ']:
+                col_clean = col_clean.replace(ignore, ' ')
+            # Substitui espaços por _
+            return col_clean.strip().replace(' ', '_')
+
+        df.columns = [normalize_col(c) for c in df.columns]
 
         # Garantir que colunas numéricas sejam números
         for col in df.columns:
