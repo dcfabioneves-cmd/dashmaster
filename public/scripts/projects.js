@@ -8,6 +8,7 @@ class ProjectManager {
         this.currentFilter = 'all';
         this.searchTerm = '';
         this.init();
+        window.projectManager = this; // Expose globally for onclick handlers
     }
 
     init() {
@@ -39,6 +40,12 @@ class ProjectManager {
             const response = await fetch(`${window.AppConfig.API.BASE_URL}/projects`, {
                 headers
             });
+
+            if (response.status === 401) {
+                console.warn('⚠️ Sessão expirada (401). Redirecionando para login...');
+                if (window.authManager) window.authManager.logout();
+                return;
+            }
 
             if (response.ok) {
                 this.projects = await response.json();
