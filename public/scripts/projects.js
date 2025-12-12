@@ -565,112 +565,17 @@ class ProjectManager {
 
     // Método auxiliar para abrir projeto via ID (usado no HTML onclick)
     openProjectById(projectId) {
-        const project = this.projects.find(p => p.id === projectId);
+        // Converter para número/string adequadamente para comparação
+        const project = this.projects.find(p => p.id == projectId);
         if (project) {
             this.openProject(project);
-        }
-    }
-
-    async openProject(project) {
-        if (!project) return;
-
-        console.log(`🚀 Abrindo projeto: ${project.name}`);
-
-        // --- CORREÇÃO: Garante que stats existe antes de usar ---
-        if (!project.stats) {
-            project.stats = {
-                views: 0,
-                exports: 0,
-                last_data_update: null
-            };
-        }
-        // -------------------------------------------------------
-
-        try {
-            // Atualizar estatísticas de visualização na API
-            const headers = window.authManager?.getAuthHeaders();
-            if (headers) {
-                // Aqui você pode fazer um PATCH para atualizar as views
-                // Exemplo: await fetch(`${window.AppConfig.API.BASE_URL}/projects/${project.id}/view`, { method: 'POST', headers });
-
-                // Por enquanto, atualizamos localmente
-                project.stats.views = (project.stats.views || 0) + 1;
-                project.last_accessed = new Date().toISOString();
-            }
-
-        } catch (error) {
-            console.warn('Não foi possível atualizar estatísticas:', error);
-        }
-
-        // Definir como projeto atual globalmente
-        this.currentProject = project;
-        if (window.AppState) {
-            window.AppState.currentProject = project;
-        }
-
-        // Atualizar UI do dashboard
-        this.updateDashboardUI(project);
-
-        // Mostrar dashboard
-        if (window.showDashboard) {
-            window.showDashboard();
-        }
-
-        // Carregar dados (chamar refreshData do main.js)
-        if (window.refreshData) {
-            window.refreshData();
-        }
-    }
-
-    updateDashboardUI(project) {
-        // Atualizar título do projeto no header
-        const projectTitleEl = document.getElementById('project-title');
-
-        if (projectTitleEl) {
-            projectTitleEl.textContent = project.name;
-        }
-
-        // Atualizar navegação com categorias do projeto
-        this.updateNavigation(project.categories);
-    }
-
-    updateNavigation(categories) {
-        const navContainer = document.querySelector('.nav-categories');
-        if (!navContainer) return;
-
-        navContainer.innerHTML = '';
-
-        categories.forEach((category, index) => {
-            const btn = document.createElement('button');
-            btn.className = `nav-category ${index === 0 ? 'active' : ''}`;
-            btn.setAttribute('data-category', category);
-            btn.onclick = () => {
-                // Remove active de todos
-                document.querySelectorAll('.nav-category').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-
-                // Carrega dashboard
-                if (window.loadDashboard) {
-                    window.loadDashboard(category);
-                }
-            };
-
-            btn.innerHTML = `
-                <i class="${this.getCategoryIcon(category)}"></i>
-                <span>${this.getCategoryName(category)}</span>
-            `;
-
-            navContainer.appendChild(btn);
-        });
-
-        // Carregar a primeira categoria automaticamente
-        if (categories.length > 0 && window.loadDashboard) {
-            window.loadDashboard(categories[0]);
+        } else {
+            console.error('Projeto não encontrado via ID:', projectId);
         }
     }
 
     async toggleArchive(projectId) {
-        const project = this.projects.find(p => p.id === projectId);
+        const project = this.projects.find(p => p.id == projectId);
         if (!project) return;
 
         try {
@@ -735,13 +640,13 @@ class ProjectManager {
             }
 
             // Remover da lista local
-            const projectIndex = this.projects.findIndex(p => p.id === projectId);
+            const projectIndex = this.projects.findIndex(p => p.id == projectId);
             if (projectIndex !== -1) {
                 const projectName = this.projects[projectIndex].name;
                 this.projects.splice(projectIndex, 1);
 
                 // Se o projeto excluído era o atual, limpar
-                if (this.currentProject?.id === projectId) {
+                if (this.currentProject?.id == projectId) {
                     this.currentProject = null;
                     if (window.AppState) window.AppState.currentProject = null;
                 }
