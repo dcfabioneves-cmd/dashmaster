@@ -1334,6 +1334,69 @@ function addModalStyles() {
     document.head.appendChild(modalStyles);
 }
 
+/**
+ * Mostra notificação toast
+ * @param {string} message - Mensagem
+ * @param {string} type - Tipo: 'success', 'error', 'warning', 'info'
+ */
+function showNotification(message, type = 'info') {
+    // Remove notificações existentes
+    const existing = document.querySelectorAll('.toast-notification');
+    existing.forEach(el => el.remove());
+
+    const toast = document.createElement('div');
+    toast.className = `toast-notification ${type} animate__animated animate__fadeInRight`;
+
+    let icon = 'fa-info-circle';
+    if (type === 'success') icon = 'fa-check-circle';
+    if (type === 'error') icon = 'fa-exclamation-circle';
+    if (type === 'warning') icon = 'fa-exclamation-triangle';
+
+    toast.innerHTML = `
+        <i class="fas ${icon}"></i>
+        <span>${message}</span>
+    `;
+
+    // Estilos do toast (se não estiverem no CSS)
+    toast.style.position = 'fixed';
+    toast.style.top = '20px';
+    toast.style.right = '20px';
+    toast.style.backgroundColor = 'var(--card-bg)';
+    toast.style.color = 'var(--text-primary)';
+    toast.style.padding = '15px 20px';
+    toast.style.borderRadius = '8px';
+    toast.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+    toast.style.zIndex = '9999';
+    toast.style.display = 'flex';
+    toast.style.alignItems = 'center';
+    toast.style.gap = '10px';
+    toast.style.borderLeft = '4px solid var(--primary-color)';
+
+    if (type === 'success') toast.style.borderLeftColor = 'var(--success-color)';
+    if (type === 'error') toast.style.borderLeftColor = 'var(--danger-color)';
+    if (type === 'warning') toast.style.borderLeftColor = 'var(--warning-color)';
+
+    document.body.appendChild(toast);
+
+    // Remove após 3 segundos
+    setTimeout(() => {
+        toast.classList.remove('animate__fadeInRight');
+        toast.classList.add('animate__fadeOutRight');
+        setTimeout(() => toast.remove(), 500);
+    }, 3000);
+}
+
+// ===== EXPOSIÇÃO GLOBAL =====
+window.showDashboard = function () {
+    if (DOM.mainDashboard) DOM.mainDashboard.style.display = 'block';
+    if (DOM.dashboardContainer) DOM.dashboardContainer.style.display = 'block';
+    if (DOM.projectManager) DOM.projectManager.style.display = 'none';
+};
+
+window.refreshData = refreshData;
+window.loadDashboard = loadDashboard;
+window.showNotification = showNotification; // Certifique-se de que esta função existe no arquivo ou crie-a
+
 // ===== INICIALIZAÇÃO =====
 
 // Garantir que a aplicação seja inicializada quando o DOM estiver pronto
