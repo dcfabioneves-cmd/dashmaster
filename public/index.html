@@ -1477,6 +1477,12 @@
                         })
                     });
 
+                    if (response.status === 401) {
+                        alert("Sessão expirada. Por favor, faça login novamente.");
+                        authManager.logout();
+                        return;
+                    }
+
                     if (!response.ok) throw new Error('Erro ao criar projeto');
                     const newProject = await response.json();
 
@@ -1500,6 +1506,12 @@
                     const response = await fetch('/api/projects', {
                         headers: { 'Authorization': `Bearer ${token}` }
                     });
+
+                    if (response.status === 401) {
+                        alert("Sessão expirada. Por favor, faça login novamente.");
+                        authManager.logout();
+                        return;
+                    }
 
                     if (!response.ok) throw new Error('Erro ao carregar projetos');
                     const projects = await response.json();
@@ -1758,6 +1770,12 @@
                         categories: [currentCategory]
                     })
                 });
+
+                if (response.status === 401) {
+                    alert("Sessão expirada. Por favor, faça login novamente.");
+                    authManager.logout();
+                    return;
+                }
 
                 if (!response.ok) {
                     const err = await response.json();
