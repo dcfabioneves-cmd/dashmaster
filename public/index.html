@@ -4,17 +4,888 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DashMaster - Dashboard de Marketing</title>
+    <title>DashMetrics - Dashboard de Marketing Profissional</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <style>
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --border-color: #dee2e6;
+            --card-bg: #ffffff;
+            --header-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --info-color: #17a2b8;
+            --primary-color: #667eea;
+        }
 
-    <!-- Ícones -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        [data-theme="dark"] {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2d2d2d;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --border-color: #404040;
+            --card-bg: #2d2d2d;
+            --header-bg: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+        }
 
-    <!-- CSS do DashMaster -->
-    <link rel="stylesheet" href="styles/main.css">
-    <link rel="stylesheet" href="styles/auth.css">
-    <link rel="stylesheet" href="styles/dashboard.css">
-    <link rel="stylesheet" href="styles/responsive.css">
-    <link rel="stylesheet" href="styles/modal.css">
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: all 0.3s ease;
+        }
+
+        /* Auth Screens */
+        .auth-container {
+            display: flex;
+            min-height: 100vh;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+
+        .auth-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 450px;
+            padding: 30px;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .auth-logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .auth-title {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .auth-subtitle {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-weight: 500;
+            color: #555;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+
+        .auth-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 10px;
+        }
+
+        .auth-btn:hover {
+            background: #5a6fd8;
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+        }
+
+        .auth-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .auth-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Project Manager */
+        .project-manager {
+            display: none;
+            padding: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .project-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .project-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .project-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .project-btn:hover {
+            background: #5a6fd8;
+        }
+
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .project-card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s;
+        }
+
+        .project-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .project-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .project-card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .project-card-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .project-card-action {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .project-card-action:hover {
+            color: var(--primary-color);
+        }
+
+        .project-card-categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+
+        .category-tag {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .project-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .project-card-date {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .modal-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .modal-btn.primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .modal-btn.secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        /* Checkbox Grid */
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Header */
+        header {
+            background: var(--header-bg);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .theme-toggle {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Navigation */
+        nav {
+            background: var(--card-bg);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            overflow-x: auto;
+        }
+
+        .nav-menu li {
+            flex-shrink: 0;
+        }
+
+        .nav-menu a {
+            display: block;
+            padding: 15px 20px;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 500;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .nav-menu a:hover,
+        .nav-menu a.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            background: var(--bg-secondary);
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: none;
+        }
+
+        .filters {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .filter-row label {
+            font-weight: 500;
+        }
+
+        .filter-row input,
+        .filter-row select {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .filter-row button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .filter-row button:hover {
+            background: #5a6fd8;
+        }
+
+        .preset-filters {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .preset-btn {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .preset-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        /* KPI Cards */
+        .kpi-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .kpi-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
+        }
+
+        .kpi-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .kpi-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .kpi-trend {
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .trend-up {
+            background: rgba(40, 167, 69, 0.2);
+            color: var(--success-color);
+        }
+
+        .trend-down {
+            background: rgba(220, 53, 69, 0.2);
+            color: var(--danger-color);
+        }
+
+        .trend-neutral {
+            background: rgba(255, 193, 7, 0.2);
+            color: var(--warning-color);
+        }
+
+        .kpi-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .kpi-description {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* Dashboard */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .chart-container {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            border: 1px solid var(--border-color);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .chart-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .download-btn {
+            background: var(--success-color);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background 0.3s ease;
+        }
+
+        .download-btn:hover {
+            background: #218838;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
+        }
+
+        /* Footer */
+        footer {
+            background: #333;
+            color: white;
+            padding: 30px 0;
+            margin-top: 50px;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            text-align: center;
+        }
+
+        .footer-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .footer-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .footer-btn:hover {
+            background: #5a6fd8;
+        }
+
+        .footer-btn.whatsapp {
+            background: #25D366;
+        }
+
+        .footer-btn.whatsapp:hover {
+            background: #128C7E;
+        }
+
+        .footer-btn.presentation {
+            background: #6f42c1;
+        }
+
+        .footer-btn.presentation:hover {
+            background: #5a2d91;
+        }
+
+        .copyright {
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: var(--text-secondary);
+        }
+
+        .error {
+            background: rgba(220, 53, 69, 0.1);
+            color: var(--danger-color);
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border: 1px solid rgba(220, 53, 69, 0.3);
+        }
+
+        /* Presentation Templates */
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .template-card {
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .template-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-5px);
+        }
+
+        .template-card.selected {
+            border-color: var(--primary-color);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .template-preview {
+            height: 150px;
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: var(--text-secondary);
+        }
+
+        .template-info {
+            padding: 15px;
+        }
+
+        .template-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .template-desc {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+
+            .nav-container {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .nav-menu {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .kpi-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .footer-btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+
+            .project-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .project-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .project-btn {
+                flex: 1;
+                justify-content: center;
+            }
+        }
+
+        /* Touch-friendly elements */
+        @media (hover: none) and (pointer: coarse) {
+
+            .download-btn,
+            .nav-menu a,
+            .preset-btn {
+                min-height: 44px;
+                min-width: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .chart-container {
+                padding: 15px;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+
+            .chart-container {
+                break-inside: avoid;
+                box-shadow: none !important;
+                border: 1px solid #ddd !important;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -22,34 +893,26 @@
     <div id="auth-container" class="auth-container">
         <div class="auth-card">
             <div class="auth-header">
-                <div class="auth-logo">📊 DashMaster</div>
+                <div class="auth-logo">📊 DashMetrics</div>
                 <h1 class="auth-title" id="auth-title">Acesse sua conta</h1>
                 <p class="auth-subtitle" id="auth-subtitle">Entre para gerenciar seus dashboards</p>
             </div>
             <form id="auth-form" class="auth-form">
                 <div class="form-group" id="name-field" style="display: none;">
                     <label for="name">Nome completo</label>
-                    <input type="text" id="name" data-required="true"
-                        oninvalid="this.setCustomValidity('Por favor, preencha este campo')"
-                        oninput="this.setCustomValidity('')">
+                    <input type="text" id="name" required>
                 </div>
                 <div class="form-group">
                     <label for="email">E-mail</label>
-                    <input type="email" id="email" required
-                        oninvalid="this.setCustomValidity('Por favor, insira um e-mail válido')"
-                        oninput="this.setCustomValidity('')">
+                    <input type="email" id="email" required>
                 </div>
                 <div class="form-group">
                     <label for="password">Senha</label>
-                    <input type="password" id="password" required
-                        oninvalid="this.setCustomValidity('Por favor, insira sua senha')"
-                        oninput="this.setCustomValidity('')">
+                    <input type="password" id="password" required>
                 </div>
                 <div class="form-group" id="confirm-password-field" style="display: none;">
                     <label for="confirm-password">Confirmar senha</label>
-                    <input type="password" id="confirm-password"
-                        oninvalid="this.setCustomValidity('As senhas não coincidem')"
-                        oninput="this.setCustomValidity('')">
+                    <input type="password" id="confirm-password">
                 </div>
                 <button type="submit" class="auth-btn" id="auth-submit">Entrar</button>
             </form>
@@ -61,325 +924,1006 @@
     </div>
 
     <!-- Project Manager -->
-    <div id="project-manager" class="project-manager" style="display: none;">
-        <div class="project-manager-container">
-            <div class="project-header">
-                <div class="project-logo">📊 DashMaster</div>
-                <h1>Seus Projetos</h1>
-                <p>Gerencie seus dashboards de marketing</p>
-                <div class="user-info">
-                    <span id="user-name">Usuário</span>
-                    <button onclick="window.authManager && window.authManager.logout()" class="logout-btn">
-                        <i class="fas fa-sign-out-alt"></i> Sair
-                    </button>
-                </div>
-            </div>
-            <div class="projects-grid" id="projects-grid">
-                <!-- Projects will be loaded here dynamically -->
-                <div class="empty-projects">
-                    <i class="fas fa-folder-open"></i>
-                    <h3>Nenhum projeto encontrado</h3>
-                    <p>Crie seu primeiro projeto para começar</p>
-                    <button id="empty-new-project" class="btn btn-primary mt-3">
-                        <i class="fas fa-plus"></i> Criar Primeiro Projeto
-                    </button>
-                </div>
-            </div>
+    <div id="project-manager" class="project-manager">
+        <div class="project-header">
+            <h1 class="project-title">Meus Projetos</h1>
             <div class="project-actions">
-                <button id="new-project-btn" class="btn btn-primary">
-                    <i class="fas fa-plus"></i> Novo Projeto
+                <button class="project-btn" id="new-project-btn">
+                    <span>+</span> Novo Projeto
+                </button>
+                <button class="project-btn" id="logout-btn">
+                    <span>🚪</span> Sair
                 </button>
             </div>
         </div>
-    </div>
-
-    <!-- Modal de Novo Projeto -->
-    <div id="new-project-modal" class="modal" style="display: none;">
-        <div class="modal-content animate__animated animate__zoomIn">
-            <div class="modal-header">
-                <h3 class="modal-title"><i class="fas fa-plus-circle"></i> Novo Projeto</h3>
-                <button id="close-new-project" class="close-btn"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label for="project-name">Nome do Projeto</label>
-                    <input type="text" id="project-name" placeholder="Ex: Dashboard Cliente X">
-                </div>
-
-                <div class="form-group url-input-group">
-                    <label for="spreadsheet-url">URL da Planilha Google Sheets</label>
-                    <div class="input-with-btn">
-                        <input type="text" id="spreadsheet-url"
-                            placeholder="https://docs.google.com/spreadsheets/d/...">
-                        <button id="validate-url" class="btn btn-secondary" title="Validar URL">
-                            <i class="fas fa-check"></i>
-                        </button>
-                    </div>
-                    <small class="text-muted">A planilha deve estar pública ou compartilhada.</small>
-                </div>
-
-                <div class="form-group">
-                    <label>Categorias de KPI</label>
-                    <div class="categories-grid">
-                        <label class="category-option">
-                            <input type="checkbox" class="category-checkbox" value="email">
-                            <span class="cat-card"><i class="fas fa-envelope"></i> E-mail</span>
-                        </label>
-                        <label class="category-option">
-                            <input type="checkbox" class="category-checkbox" value="social">
-                            <span class="cat-card"><i class="fas fa-share-alt"></i> Social</span>
-                        </label>
-                        <label class="category-option">
-                            <input type="checkbox" class="category-checkbox" value="google-ads">
-                            <span class="cat-card"><i class="fab fa-google"></i> Google Ads</span>
-                        </label>
-                        <label class="category-option">
-                            <input type="checkbox" class="category-checkbox" value="meta-ads">
-                            <span class="cat-card"><i class="fab fa-facebook"></i> Meta Ads</span>
-                        </label>
-                        <label class="category-option">
-                            <input type="checkbox" class="category-checkbox" value="seo">
-                            <span class="cat-card"><i class="fas fa-search"></i> SEO</span>
-                        </label>
-                        <label class="category-option">
-                            <input type="checkbox" class="category-checkbox" value="ecommerce">
-                            <span class="cat-card"><i class="fas fa-shopping-cart"></i> E-commerce</span>
-                        </label>
-                        <label class="category-option">
-                            <input type="checkbox" class="category-checkbox" value="blog">
-                            <span class="cat-card"><i class="fas fa-blog"></i> Blog</span>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="form-group options-group">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="auto-refresh" checked>
-                        Atualização automática (5 min)
-                    </label>
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="email-reports">
-                        Receber relatórios semanais
-                    </label>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button id="cancel-new-project" class="btn btn-secondary modal-btn">Cancelar</button>
-                <button id="create-project" onclick="window.projectManager && window.projectManager.createProject()"
-                    class="btn btn-primary modal-btn">Criar Projeto</button>
-            </div>
+        <div id="projects-grid" class="project-grid">
+            <!-- Projects will be loaded here -->
         </div>
     </div>
 
     <!-- Dashboard -->
     <header id="dashboard-header" style="display: none;">
-        <div class="dashboard-toolbar">
-            <div class="toolbar-left">
-                <div class="logo">📊 DashMaster</div>
-                <div class="project-info">
-                    <h2 id="project-title">Dashboard de Marketing</h2>
-                    <div class="connection-status" id="connection-status">
-                        <i class="fas fa-wifi"></i> Online
-                    </div>
+        <div class="header-container">
+            <div class="logo-container">
+                <div class="logo">DM</div>
+                <div class="site-title">
+                    <h1>Dashboard de Marketing</h1>
+                    <p>Analise suas métricas em um só lugar</p>
                 </div>
             </div>
-            <div class="toolbar-right">
-                <div class="user-menu">
+            <div class="user-menu">
+                <div class="user-info">
                     <div class="user-avatar" id="user-avatar">U</div>
                     <span id="user-name">Usuário</span>
-                    <div class="dropdown-menu">
-                        <a href="#" onclick="window.showProjectManager && showProjectManager()"><i
-                                class="fas fa-th-large"></i> Projetos</a>
-                        <a href="#" onclick="window.showSettings && showSettings()"><i class="fas fa-cog"></i>
-                            Configurações</a>
-                        <a href="#" onclick="window.authManager && window.authManager.logout()"><i
-                                class="fas fa-sign-out-alt"></i> Sair</a>
-                    </div>
+                </div>
+                <div class="header-controls">
+                    <button class="theme-toggle" id="theme-toggle">
+                        <span id="theme-icon">🌙</span> <span id="theme-text">Modo Escuro</span>
+                    </button>
+                    <button class="theme-toggle" id="back-to-projects">
+                        <span>←</span> <span>Meus Projetos</span>
+                    </button>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- Dashboard Navigation -->
     <nav id="dashboard-nav" style="display: none;">
-        <div class="nav-categories">
-            <button class="nav-category active" data-category="email"
-                onclick="window.loadDashboard && loadDashboard('email')">
-                <i class="fas fa-envelope"></i>
-                <span>E-mail Marketing</span>
-            </button>
-            <button class="nav-category" data-category="social"
-                onclick="window.loadDashboard && loadDashboard('social')">
-                <i class="fas fa-share-alt"></i>
-                <span>Redes Sociais</span>
-            </button>
-            <button class="nav-category" data-category="ads" onclick="window.loadDashboard && loadDashboard('ads')">
-                <i class="fas fa-ad"></i>
-                <span>Google Ads</span>
-            </button>
-            <button class="nav-category" data-category="analytics"
-                onclick="window.loadDashboard && loadDashboard('analytics')">
-                <i class="fas fa-chart-bar"></i>
-                <span>Google Analytics</span>
-            </button>
+        <div class="nav-container">
+            <ul class="nav-menu">
+                <li><a href="#" class="nav-link active" data-category="email">E-mail Marketing</a></li>
+                <li><a href="#" class="nav-link" data-category="social">Redes Sociais</a></li>
+                <li><a href="#" class="nav-link" data-category="seo">SEO</a></li>
+                <li><a href="#" class="nav-link" data-category="ecommerce">E-commerce</a></li>
+                <li><a href="#" class="nav-link" data-category="google-ads">Google Ads</a></li>
+                <li><a href="#" class="nav-link" data-category="meta-ads">Meta Ads</a></li>
+                <li><a href="#" class="nav-link" data-category="blog">Blog</a></li>
+            </ul>
+            <div class="preset-filters no-print">
+                <button class="preset-btn active" data-preset="30d">30 Dias</button>
+                <button class="preset-btn" data-preset="3m">3 Meses</button>
+                <button class="preset-btn" data-preset="quarter">Trimestre</button>
+                <button class="preset-btn" data-preset="ytd">YTD</button>
+            </div>
         </div>
     </nav>
 
-    <!-- Dashboard Container -->
-    <div id="dashboard-container" style="display: none;">
-        <!-- Loading Skeleton -->
-        <div id="loading-skeleton" class="loading-skeleton" style="display: none;">
-            <div class="skeleton-header"></div>
-            <div class="skeleton-kpi">
-                <div class="skeleton-kpi-card"></div>
-                <div class="skeleton-kpi-card"></div>
-                <div class="skeleton-kpi-card"></div>
-                <div class="skeleton-kpi-card"></div>
+    <div class="container" id="dashboard-container">
+        <!-- Filters -->
+        <div class="filters no-print">
+            <div class="filter-row">
+                <label for="start-date">Data Inicial:</label>
+                <input type="date" id="start-date">
+                <label for="end-date">Data Final:</label>
+                <input type="date" id="end-date">
+                <button id="apply-filters">Aplicar Filtros</button>
+                <button id="load-data" style="background: #17a2b8;">Carregar Dados</button>
             </div>
-            <div class="skeleton-charts">
-                <div class="skeleton-chart"></div>
-                <div class="skeleton-chart"></div>
-                <div class="skeleton-chart"></div>
-                <div class="skeleton-chart"></div>
+            <div class="filter-row">
+                <label for="comparison-period">Comparar com:</label>
+                <select id="comparison-period">
+                    <option value="none">Não comparar</option>
+                    <option value="previous_period">Período Anterior</option>
+                    <option value="previous_year">Ano Anterior</option>
+                </select>
             </div>
         </div>
 
-        <!-- Main Dashboard Content -->
-        <div id="main-dashboard" class="dashboard">
-            <!-- Dashboard Controls -->
-            <div class="dashboard-controls">
-                <div class="date-range-selector">
-                    <button class="date-range-btn" data-range="7d" onclick="window.setDateRange && setDateRange('7d')">7
-                        dias</button>
-                    <button class="date-range-btn active" data-range="30d"
-                        onclick="window.setDateRange && setDateRange('30d')">30 dias</button>
-                    <button class="date-range-btn" data-range="90d"
-                        onclick="window.setDateRange && setDateRange('90d')">90 dias</button>
-                    <button class="date-range-btn" data-range="custom"
-                        onclick="window.toggleCustomDateRange && toggleCustomDateRange()">
-                        <i class="fas fa-calendar-alt"></i> Personalizado
-                    </button>
-                    <div class="custom-date-range" id="custom-date-range" style="display: none;">
-                        <input type="date" id="start-date">
-                        <span>até</span>
-                        <input type="date" id="end-date">
-                        <button id="apply-date-range"
-                            onclick="window.applyCustomDateRange && applyCustomDateRange()">Aplicar</button>
-                    </div>
-                    <div class="date-range-display">
-                        <i class="fas fa-calendar"></i>
-                        <span id="date-range-text">Últimos 30 dias</span>
-                    </div>
-                </div>
-                <div class="dashboard-actions">
-                    <button onclick="window.refreshData && refreshData()" class="btn btn-secondary"
-                        title="Atualizar dados">
-                        <i class="fas fa-redo"></i>
-                    </button>
-                    <button onclick="window.exportDashboard && exportDashboard()" class="btn btn-secondary"
-                        title="Exportar dashboard">
-                        <i class="fas fa-download"></i>
-                    </button>
-                    <button onclick="window.toggleFullscreen && toggleFullscreen()" class="btn btn-secondary"
-                        title="Tela cheia">
-                        <i class="fas fa-expand"></i>
-                    </button>
-                </div>
-            </div>
+        <!-- KPI Cards -->
+        <div id="kpi-cards" class="kpi-cards">
+            <!-- KPI cards serão gerados dinamicamente -->
+        </div>
 
-            <!-- KPI Cards -->
-            <div class="kpi-grid" id="kpi-cards">
-                <!-- KPI cards will be loaded here dynamically -->
-            </div>
-
-            <!-- Insights Section -->
-            <div class="insights-section">
-                <h3><i class="fas fa-lightbulb"></i> Insights Inteligentes</h3>
-                <div class="insights-container" id="insights-container">
-                    <!-- Insights will be loaded here dynamically -->
-                </div>
-            </div>
-
-            <!-- Charts Grid -->
-            <div class="charts-grid" id="charts-grid">
-                <!-- Charts will be loaded here dynamically -->
-            </div>
-
-            <!-- Data Table Section -->
-            <div class="data-table-section" id="data-table-section">
-                <h3><i class="fas fa-table"></i> Dados Detalhados</h3>
-                <div class="table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr id="table-headers">
-                                <!-- Table headers will be loaded here dynamically -->
-                            </tr>
-                        </thead>
-                        <tbody id="table-body">
-                            <!-- Table data will be loaded here dynamically -->
-                        </tbody>
-                    </table>
-                </div>
+        <!-- Dashboard -->
+        <div id="dashboard" class="dashboard">
+            <div class="loading">
+                <h3>Clique em "Carregar Dados" para ver os gráficos</h3>
             </div>
         </div>
     </div>
 
-    <!-- Dashboard Footer -->
-    <footer id="dashboard-footer" style="display: none;">
-        <div class="footer-content">
-            <div class="footer-left">
-                <div class="data-info">
-                    <span><i class="fas fa-database"></i> <span id="data-points">0</span> pontos de dados</span>
-                    <span class="divider">|</span>
-                    <span><i class="fas fa-clock"></i> Última atualização: <span id="last-update">--:--</span></span>
-                </div>
+    <!-- Footer -->
+    <footer class="no-print" id="dashboard-footer" style="display: none;">
+        <div class="footer-container">
+            <div class="footer-buttons">
+                <button class="footer-btn" id="download-pdf">
+                    📄 Baixar PDF Completo
+                </button>
+                <button class="footer-btn" id="download-png">
+                    🖼️ Baixar Todos PNG
+                </button>
+                <button class="footer-btn whatsapp" id="share-whatsapp">
+                    📱 Compartilhar no WhatsApp
+                </button>
+                <button class="footer-btn presentation" id="presentation-mode">
+                    🎬 Criar Apresentação
+                </button>
             </div>
-            <div class="footer-right">
-                <div class="alerts">
-                    <i class="fas fa-bell"></i>
-                    <span class="alert-count" id="alerts-count">0</span> alertas
-                </div>
-                <div class="theme-toggle">
-                    <button onclick="window.toggleTheme && toggleTheme()">
-                        <i class="fas fa-moon"></i>
-                    </button>
-                </div>
+            <div class="copyright">
+                &copy; 2024 DashMetrics - Dashboard de Marketing. Todos os direitos reservados.
             </div>
         </div>
     </footer>
 
-    <!-- Notifications Container -->
-    <div id="notification-container" class="notification-container"></div>
+    <!-- Modals -->
+    <div id="new-project-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Criar Novo Projeto</h2>
+                <button class="modal-close" id="close-new-project">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="project-name">Nome do Projeto</label>
+                    <input type="text" id="project-name" placeholder="Ex: Campanha Q2 2024">
+                </div>
+                <div class="form-group">
+                    <label>Selecione as categorias de KPIs</label>
+                    <div class="checkbox-grid">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="category-email" value="email">
+                            <label for="category-email">E-mail Marketing</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="category-social" value="social">
+                            <label for="category-social">Redes Sociais</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="category-seo" value="seo">
+                            <label for="category-seo">SEO</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="category-ecommerce" value="ecommerce">
+                            <label for="category-ecommerce">E-commerce</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="category-google-ads" value="google-ads">
+                            <label for="category-google-ads">Google Ads</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="category-meta-ads" value="meta-ads">
+                            <label for="category-meta-ads">Meta Ads</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="category-blog" value="blog">
+                            <label for="category-blog">Blog</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="spreadsheet-url">URL da Planilha (Google Sheets)</label>
+                    <input type="url" id="spreadsheet-url" placeholder="https://docs.google.com/spreadsheets/d/...">
+                    <small>Certifique-se de que a planilha segue o modelo correto e está compartilhada para
+                        visualização.</small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn secondary" id="cancel-new-project">Cancelar</button>
+                <button class="modal-btn primary" id="create-project">Criar Projeto</button>
+            </div>
+        </div>
+    </div>
 
-    <!-- Scripts in correct order -->
-    <!-- Firebase SDK (apenas auth por enquanto) -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <div id="presentation-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Criar Apresentação</h2>
+                <button class="modal-close" id="close-presentation">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="presentation-title">Título da Apresentação</label>
+                    <input type="text" id="presentation-title" placeholder="Ex: Relatório de Performance - Q2 2024">
+                </div>
+                <div class="form-group">
+                    <label>Selecione um modelo de apresentação</label>
+                    <div class="template-grid">
+                        <div class="template-card" data-template="modern">
+                            <div class="template-preview">📈</div>
+                            <div class="template-info">
+                                <div class="template-name">Moderno</div>
+                                <div class="template-desc">Design limpo e profissional</div>
+                            </div>
+                        </div>
+                        <div class="template-card" data-template="corporate">
+                            <div class="template-preview">🏢</div>
+                            <div class="template-info">
+                                <div class="template-name">Corporativo</div>
+                                <div class="template-desc">Formato executivo tradicional</div>
+                            </div>
+                        </div>
+                        <div class="template-card" data-template="creative">
+                            <div class="template-preview">🎨</div>
+                            <div class="template-info">
+                                <div class="template-name">Criativo</div>
+                                <div class="template-desc">Visual moderno e impactante</div>
+                            </div>
+                        </div>
+                        <div class="template-card" data-template="minimal">
+                            <div class="template-preview">⚪</div>
+                            <div class="template-info">
+                                <div class="template-name">Minimalista</div>
+                                <div class="template-desc">Foco total nos dados</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn secondary" id="cancel-presentation">Cancelar</button>
+                <button class="modal-btn primary" id="generate-presentation">Gerar Apresentação</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        // CONFIGURAÇÕES DOS GRÁFICOS (Atualizado para chaves do Backend)
+        const chartConfigs = {
+            'email': [
+                { title: 'Taxa de Abertura', type: 'line', dataKey: 'taxa_abertura' },
+                { title: 'Taxa de Cliques', type: 'line', dataKey: 'taxa_cliques' },
+                { title: 'Taxa de Conversão', type: 'bar', dataKey: 'taxa_conversao' },
+                { title: 'Taxa de Rejeição', type: 'line', dataKey: 'taxa_rejeicao' }
+            ],
+            'social': [
+                { title: 'Alcance', type: 'line', dataKey: 'alcance' },
+                { title: 'Engajamento', type: 'line', dataKey: 'engajamento' },
+                { title: 'Crescimento Seguidores', type: 'bar', dataKey: 'crescimento_seguidores' },
+                { title: 'Taxa CTR', type: 'line', dataKey: 'taxa_ctr' },
+                { title: 'Taxa CPC', type: 'line', dataKey: 'taxa_cpc' },
+                { title: 'Taxa CPM', type: 'line', dataKey: 'taxa_cpm' },
+                { title: 'Taxa CPV', type: 'line', dataKey: 'taxa_cpv' },
+                { title: 'Taxa ROAS', type: 'line', dataKey: 'taxa_roas' }
+            ],
+            'seo': [
+                { title: 'Crescimento do Tráfego', type: 'line', dataKey: 'crescimento_trafego' },
+                { title: 'CTR SEO', type: 'line', dataKey: 'ctr_seo' },
+                { title: 'Posicionamento Médio', type: 'line', dataKey: 'posicionamento_medio' },
+                { title: 'Autoridade', type: 'bar', dataKey: 'autoridade' },
+                { title: 'Backlinks', type: 'line', dataKey: 'backlinks' },
+                { title: 'Ticket médio / Conversão', type: 'bar', dataKey: 'ticket_medio_conversao' },
+                { title: 'Conversões', type: 'line', dataKey: 'conversoes' },
+                { title: 'Receita', type: 'line', dataKey: 'receita' }
+            ],
+            'ecommerce': [
+                { title: 'Taxa de Conversão (CVR)', type: 'line', dataKey: 'taxa_conversao_cvr' },
+                { title: 'Ticket Médio', type: 'bar', dataKey: 'ticket_medio' },
+                { title: 'Custo de Aquisição por Cliente', type: 'line', dataKey: 'custo_aquisicao_cliente' },
+                { title: 'Retenção', type: 'line', dataKey: 'retencao' },
+                { title: 'Taxa de Abandono do Carrinho', type: 'line', dataKey: 'taxa_abandono_carrinho' },
+                { title: 'Taxa de Cancelamento', type: 'line', dataKey: 'taxa_cancelamento' },
+                { title: 'Tempo Médio de Entrega', type: 'bar', dataKey: 'tempo_medio_entrega' },
+                { title: 'ROAS', type: 'line', dataKey: 'roas' }
+            ],
+            'google-ads': [
+                { title: 'CTR GOOGLE', type: 'line', dataKey: 'ctr_google' },
+                { title: 'CPC GOOGLE', type: 'line', dataKey: 'cpc_google' },
+                { title: 'CONVERSÕES GOOGLE', type: 'bar', dataKey: 'conversoes_google' },
+                { title: 'CPA GOOGLE', type: 'line', dataKey: 'cpa_google' },
+                { title: 'ROAS GOOGLE', type: 'line', dataKey: 'roas_google' }
+            ],
+            'meta-ads': [
+                { title: 'CPM', type: 'line', dataKey: 'cpm' },
+                { title: 'CTR', type: 'line', dataKey: 'ctr' },
+                { title: 'CPC', type: 'line', dataKey: 'cpc' },
+                { title: 'Frequência', type: 'bar', dataKey: 'frequencia' },
+                { title: 'Conversões', type: 'line', dataKey: 'conversoes' },
+                { title: 'CPA', type: 'line', dataKey: 'cpa' },
+                { title: 'ROAS', type: 'line', dataKey: 'roas' }
+            ],
+            'blog': [
+                { title: 'Sessões', type: 'line', dataKey: 'sessoes' },
+                { title: 'Page Views', type: 'bar', dataKey: 'page_views' },
+                { title: 'Tempo Médio na Página (min)', type: 'line', dataKey: 'tempo_medio_pagina_min' },
+                { title: 'Leads Convertidos', type: 'bar', dataKey: 'leads_convertidos' },
+                { title: 'Taxa de Rejeição', type: 'line', dataKey: 'taxa_rejeicao' }
+            ]
+        };
 
-    <!-- Bibliotecas de Terceiros -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+        // Classes para gerenciamento das funcionalidades
+        class AuthManager {
+            constructor() {
+                this.isLoginMode = true;
+                this.currentUser = null;
+                this.init();
+            }
 
-    <!-- Core Scripts -->
-    <script src="scripts/config.js"></script>
-    <script src="scripts/utils.js"></script>
+            init() {
+                const navToken = localStorage.getItem('access_token');
+                const savedUser = localStorage.getItem('currentUser');
 
-    <!-- Managers (Classes) - Note que removemos a pasta 'managers/' -->
-    <script src="scripts/auth.js"></script> <!-- Contém AuthManager -->
-    <script src="scripts/projects.js"></script> <!-- Contém ProjectManager -->
-    <script src="scripts/charts.js"></script> <!-- Contém ChartManager -->
-    <script src="scripts/insights.js"></script> <!-- Contém InsightsManager -->
-    <script src="scripts/export.js"></script> <!-- Contém ExportManager -->
+                if (navToken && savedUser) {
+                    this.currentUser = JSON.parse(savedUser);
+                    this.showProjectManager();
+                } else {
+                    this.showAuthScreen();
+                }
 
-    <!-- Arquivos que faltavam -->
-    <script src="scripts/theme.js"></script> <!-- ThemeManager -->
-    <script src="scripts/data.js"></script> <!-- DataManager -->
+                this.setupEventListeners();
+            }
 
-    <!-- Main Application Logic -->
-    <script src="scripts/main.js"></script>
+            setupEventListeners() {
+                document.getElementById('auth-switch').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.toggleAuthMode();
+                });
+
+                document.getElementById('auth-form').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.handleAuth();
+                });
+
+                document.getElementById('logout-btn').addEventListener('click', () => {
+                    this.logout();
+                });
+            }
+
+            toggleAuthMode() {
+                this.isLoginMode = !this.isLoginMode;
+                this.updateAuthUI();
+            }
+
+            updateAuthUI() {
+                const title = document.getElementById('auth-title');
+                const subtitle = document.getElementById('auth-subtitle');
+                const submitBtn = document.getElementById('auth-submit');
+                const switchText = document.getElementById('auth-switch-text');
+                const switchLink = document.getElementById('auth-switch');
+                const nameField = document.getElementById('name-field');
+                const confirmPasswordField = document.getElementById('confirm-password-field');
+
+                if (this.isLoginMode) {
+                    title.textContent = 'Acesse sua conta';
+                    subtitle.textContent = 'Entre para gerenciar seus dashboards';
+                    submitBtn.textContent = 'Entrar';
+                    switchText.textContent = 'Não tem uma conta?';
+                    switchLink.textContent = 'Cadastre-se';
+                    nameField.style.display = 'none';
+                    confirmPasswordField.style.display = 'none';
+                } else {
+                    title.textContent = 'Criar sua conta';
+                    subtitle.textContent = 'Cadastre-se para começar a usar';
+                    submitBtn.textContent = 'Cadastrar';
+                    switchText.textContent = 'Já tem uma conta?';
+                    switchLink.textContent = 'Entrar';
+                    nameField.style.display = 'flex';
+                    confirmPasswordField.style.display = 'flex';
+                }
+            }
+
+            async handleAuth() {
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                const submitBtn = document.getElementById('auth-submit');
+
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Aguarde...';
+
+                try {
+                    if (this.isLoginMode) {
+                        await this.login(email, password);
+                    } else {
+                        const name = document.getElementById('name').value;
+                        const confirmPassword = document.getElementById('confirm-password').value;
+
+                        if (password !== confirmPassword) {
+                            throw new Error('As senhas não coincidem!');
+                        }
+
+                        await this.register(name, email, password);
+                    }
+                } catch (error) {
+                    alert(error.message);
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = this.isLoginMode ? 'Entrar' : 'Cadastrar';
+                }
+            }
+
+            async login(email, password) {
+                const formData = new URLSearchParams();
+                formData.append('username', email);
+                formData.append('password', password);
+
+                const response = await fetch('/api/auth/token', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const err = await response.json();
+                    throw new Error(err.detail || 'Erro no login');
+                }
+
+                const data = await response.json();
+                this.currentUser = { email: data.user_email, name: data.user_name || email };
+
+                localStorage.setItem('access_token', data.access_token);
+                localStorage.setItem('currentUser', JSON.stringify(this.currentUser));
+                this.showProjectManager();
+            }
+
+            async register(name, email, password) {
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password, username: name })
+                });
+
+                if (!response.ok) {
+                    const err = await response.json();
+                    throw new Error(err.detail || 'Erro no registro');
+                }
+
+                alert('Conta criada com sucesso! Faça login.');
+                this.toggleAuthMode();
+            }
+
+            logout() {
+                this.currentUser = null;
+                localStorage.removeItem('currentUser');
+                localStorage.removeItem('access_token');
+                this.showAuthScreen();
+            }
+
+            showAuthScreen() {
+                document.getElementById('auth-container').style.display = 'flex';
+                document.getElementById('project-manager').style.display = 'none';
+                document.getElementById('dashboard-header').style.display = 'none';
+                document.getElementById('dashboard-nav').style.display = 'none';
+                document.getElementById('dashboard-container').style.display = 'none';
+                document.getElementById('dashboard-footer').style.display = 'none';
+            }
+
+            showProjectManager() {
+                document.getElementById('auth-container').style.display = 'none';
+                document.getElementById('project-manager').style.display = 'block';
+                document.getElementById('dashboard-header').style.display = 'none';
+                document.getElementById('dashboard-nav').style.display = 'none';
+                document.getElementById('dashboard-container').style.display = 'none';
+                document.getElementById('dashboard-footer').style.display = 'none';
+
+                document.getElementById('user-name').textContent = this.currentUser.name;
+                document.getElementById('user-avatar').textContent = (this.currentUser.name || 'U').charAt(0).toUpperCase();
+
+                projectManager.loadUserProjects();
+            }
+
+            showDashboard() {
+                document.getElementById('auth-container').style.display = 'none';
+                document.getElementById('project-manager').style.display = 'none';
+                document.getElementById('dashboard-header').style.display = 'block';
+                document.getElementById('dashboard-nav').style.display = 'block';
+                document.getElementById('dashboard-container').style.display = 'block';
+                document.getElementById('dashboard-footer').style.display = 'block';
+            }
+        }
+
+        class ProjectManager {
+            constructor() {
+                this.currentProject = null;
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+            }
+
+            setupEventListeners() {
+                document.getElementById('new-project-btn').addEventListener('click', () => {
+                    this.showNewProjectModal();
+                });
+
+                document.getElementById('create-project').addEventListener('click', () => {
+                    this.createProject();
+                });
+
+                document.getElementById('cancel-new-project').addEventListener('click', () => {
+                    this.hideNewProjectModal();
+                });
+
+                document.getElementById('close-new-project').addEventListener('click', () => {
+                    this.hideNewProjectModal();
+                });
+
+                document.getElementById('back-to-projects').addEventListener('click', () => {
+                    authManager.showProjectManager();
+                });
+            }
+
+            showNewProjectModal() {
+                document.getElementById('new-project-modal').style.display = 'flex';
+            }
+
+            hideNewProjectModal() {
+                document.getElementById('new-project-modal').style.display = 'none';
+                document.getElementById('project-name').value = '';
+                document.getElementById('spreadsheet-url').value = '';
+                document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+            }
+
+            async createProject() {
+                const name = document.getElementById('project-name').value;
+                const spreadsheetUrl = document.getElementById('spreadsheet-url').value;
+
+                const selectedCategories = [];
+                document.querySelectorAll('input[type="checkbox"]:checked').forEach(checkbox => {
+                    selectedCategories.push(checkbox.value);
+                });
+
+                if (!name || selectedCategories.length === 0 || !spreadsheetUrl) {
+                    alert('Preencha todos os campos obrigatórios');
+                    return;
+                }
+
+                const token = localStorage.getItem('access_token');
+                const btn = document.getElementById('create-project');
+                btn.disabled = true;
+                btn.textContent = 'Criando...';
+
+                try {
+                    const response = await fetch('/api/projects', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            name,
+                            spreadsheet_url: spreadsheetUrl,
+                            categories: selectedCategories
+                        })
+                    });
+
+                    if (!response.ok) throw new Error('Erro ao criar projeto');
+                    const newProject = await response.json();
+
+                    this.hideNewProjectModal();
+                    this.loadUserProjects();
+                    this.openProject(newProject);
+                } catch (e) {
+                    alert(e.message);
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = 'Criar Projeto';
+                }
+            }
+
+            async loadUserProjects() {
+                const token = localStorage.getItem('access_token');
+                const projectsGrid = document.getElementById('projects-grid');
+                projectsGrid.innerHTML = '<div class="loading">Carregando projetos...</div>';
+
+                try {
+                    const response = await fetch('/api/projects', {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+
+                    if (!response.ok) throw new Error('Erro ao carregar projetos');
+                    const projects = await response.json();
+
+                    if (projects.length === 0) {
+                        projectsGrid.innerHTML = `
+                            <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-secondary);">
+                                <h3>Nenhum projeto encontrado</h3>
+                                <p>Clique em "Novo Projeto" para criar seu primeiro dashboard</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    projectsGrid.innerHTML = projects.map(project => `
+                        <div class="project-card" data-project-id="${project.id}">
+                            <div class="project-card-header">
+                                <h3 class="project-card-title">${project.name}</h3>
+                                <div class="project-card-actions">
+                                    <button class="project-card-action" onclick='projectManager.openProject(${JSON.stringify(project).replace(/'/g, "&#39;")})'>📊</button>
+                                </div>
+                            </div>
+                            <div class="project-card-categories">
+                                ${project.categories.map(cat => `<span class="category-tag">${getCategoryName(cat)}</span>`).join('')}
+                            </div>
+                        </div>
+                    `).join('');
+                } catch (e) {
+                    projectsGrid.innerHTML = `<div class="error">${e.message}</div>`;
+                }
+            }
+
+            openProject(project) {
+                this.currentProject = project;
+
+                const navMenu = document.querySelector('.nav-menu');
+                navMenu.innerHTML = '';
+
+                project.categories.forEach(category => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<a href="#" class="nav-link ${category === project.categories[0] ? 'active' : ''}" data-category="${category}">${getCategoryName(category)}</a>`;
+                    navMenu.appendChild(li);
+                });
+
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    link.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                        this.classList.add('active');
+                        currentCategory = this.getAttribute('data-category');
+                        loadDashboard(currentCategory);
+                    });
+                });
+
+                currentCategory = project.categories[0];
+                authManager.showDashboard();
+                loadDataFromSheets();
+            }
+        }
+
+        class ThemeManager {
+            constructor() {
+                this.currentTheme = localStorage.getItem('theme') || 'light';
+                this.init();
+            }
+            init() {
+                this.applyTheme(this.currentTheme);
+                this.setupEventListeners();
+            }
+            setupEventListeners() {
+                document.getElementById('theme-toggle').addEventListener('click', () => {
+                    this.toggleTheme();
+                });
+            }
+            applyTheme(theme) {
+                document.documentElement.setAttribute('data-theme', theme);
+                const icon = document.getElementById('theme-icon');
+                const text = document.getElementById('theme-text');
+                if (theme === 'dark') {
+                    icon.textContent = '☀️';
+                    text.textContent = 'Modo Claro';
+                } else {
+                    icon.textContent = '🌙';
+                    text.textContent = 'Modo Escuro';
+                }
+                localStorage.setItem('theme', theme);
+                this.updateChartsTheme(theme);
+            }
+            toggleTheme() {
+                this.currentTheme = this.currentTheme === 'light' ? 'dark' : 'light';
+                this.applyTheme(this.currentTheme);
+            }
+            updateChartsTheme(theme) {
+                const isDark = theme === 'dark';
+                const textColor = isDark ? '#ffffff' : '#333333';
+                const gridColor = isDark ? '#404040' : '#e0e0e0';
+                currentCharts.forEach(chart => {
+                    if (chart.options.scales) {
+                        if (chart.options.scales.x) {
+                            chart.options.scales.x.grid.color = gridColor;
+                            chart.options.scales.x.ticks.color = textColor;
+                        }
+                        if (chart.options.scales.y) {
+                            chart.options.scales.y.grid.color = gridColor;
+                            chart.options.scales.y.ticks.color = textColor;
+                        }
+                    }
+                    if (chart.options.plugins.legend && chart.options.plugins.legend.labels) {
+                        chart.options.plugins.legend.labels.color = textColor;
+                    }
+                    chart.update();
+                });
+            }
+        }
+
+        class KpiCardsManager {
+            constructor() {
+                this.cardsContainer = document.getElementById('kpi-cards');
+            }
+            renderKpiCards(data) {
+                if (!data || data.length === 0) {
+                    this.cardsContainer.innerHTML = '<div class="error">Nenhum dado disponível para exibir KPIs</div>';
+                    return;
+                }
+                const kpis = this.calculateKpis(data);
+                this.cardsContainer.innerHTML = kpis.map(kpi => `
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <h3 class="kpi-title">${kpi.title}</h3>
+                        </div>
+                        <div class="kpi-value">${kpi.value}</div>
+                        <div class="kpi-description">${kpi.description}</div>
+                    </div>
+                `).join('');
+            }
+            calculateKpis(currentData) {
+                // Simplificação: pega médias das colunas configuradas
+                const configs = chartConfigs[currentCategory] || [];
+                // Pega apenas os 4 primeiros
+                return configs.slice(0, 4).map(config => {
+                    const val = this.calculateAverage(currentData, config.dataKey);
+                    return {
+                        title: config.title,
+                        value: val,
+                        description: 'Média do período'
+                    };
+                });
+            }
+            calculateAverage(data, key) {
+                if (!data || data.length === 0) return 0;
+                // Ajuste para chaves normalizadas que podem vir com _ ou nao
+                const values = data.map(row => parseFloat(row[key]) || 0);
+                const validValues = values.filter(v => !isNaN(v));
+                if (validValues.length === 0) return 0;
+                const sum = validValues.reduce((a, b) => a + b, 0);
+                return (sum / validValues.length).toFixed(1);
+            }
+        }
+
+        class PresentationManager {
+            constructor() {
+                this.selectedTemplate = null;
+                this.init();
+            }
+            init() {
+                this.setupEventListeners();
+            }
+            setupEventListeners() {
+                document.getElementById('presentation-mode').addEventListener('click', () => {
+                    this.showPresentationModal();
+                });
+                document.getElementById('generate-presentation').addEventListener('click', () => {
+                    this.generatePresentation();
+                });
+                document.getElementById('cancel-presentation').addEventListener('click', () => {
+                    this.hidePresentationModal();
+                });
+                document.getElementById('close-presentation').addEventListener('click', () => {
+                    this.hidePresentationModal();
+                });
+                document.querySelectorAll('.template-card').forEach(card => {
+                    card.addEventListener('click', () => {
+                        document.querySelectorAll('.template-card').forEach(c => {
+                            c.classList.remove('selected');
+                        });
+                        card.classList.add('selected');
+                        this.selectedTemplate = card.getAttribute('data-template');
+                    });
+                });
+            }
+            showPresentationModal() {
+                document.getElementById('presentation-modal').style.display = 'flex';
+            }
+            hidePresentationModal() {
+                document.getElementById('presentation-modal').style.display = 'none';
+                document.querySelectorAll('.template-card').forEach(c => {
+                    c.classList.remove('selected');
+                });
+                this.selectedTemplate = null;
+                document.getElementById('presentation-title').value = '';
+            }
+            generatePresentation() {
+                alert('Funcionalidade de apresentação em desenvolvimento (requer backend)');
+                this.hidePresentationModal();
+            }
+        }
+
+        function getCategoryName(category) {
+            const names = {
+                'email': 'E-mail Marketing',
+                'social': 'Redes Sociais',
+                'seo': 'SEO',
+                'ecommerce': 'E-commerce',
+                'google-ads': 'Google Ads',
+                'meta-ads': 'Meta Ads',
+                'blog': 'Blog'
+            };
+            return names[category] || category;
+        }
+
+        let currentCharts = [];
+        let currentCategory = 'email';
+        let sheetData = {};
+
+        const authManager = new AuthManager();
+        const projectManager = new ProjectManager();
+        const themeManager = new ThemeManager();
+        const kpiCardsManager = new KpiCardsManager();
+        const presentationManager = new PresentationManager();
+
+        document.getElementById('load-data').addEventListener('click', function () {
+            loadDataFromSheets();
+        });
+
+        async function loadDataFromSheets() {
+            if (!projectManager.currentProject) return;
+
+            const button = document.getElementById('load-data');
+            const originalText = button.textContent;
+            button.textContent = 'Processando IA...';
+            button.disabled = true;
+
+            const token = localStorage.getItem('access_token');
+            const dashboard = document.getElementById('dashboard');
+            dashboard.innerHTML = '<div class="loading"><h3>Consultando Google Sheets e Processando com Pandas...</h3></div>';
+
+            try {
+                const response = await fetch('/api/process-data', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        spreadsheet_url: projectManager.currentProject.spreadsheet_url,
+                        categories: [currentCategory]
+                    })
+                });
+
+                if (!response.ok) {
+                    const err = await response.json();
+                    throw new Error(err.detail || 'Erro ao processar dados');
+                }
+
+                const apiResponse = await response.json();
+
+                // O backend retorna { data: { timeline: [...], ... } }
+                // Vamos normalizar para o formato que o frontend espera: sheetData[category] = [...]
+                const rows = apiResponse.data.timeline || [];
+
+                // Mapear dados para garantir que campos de data existam
+                sheetData[currentCategory] = rows;
+
+                loadDashboard(currentCategory);
+                button.textContent = 'Dados Atualizados!';
+            } catch (e) {
+                console.error(e);
+                dashboard.innerHTML = `<div class="error"><h3>Erro</h3><p>${e.message}</p></div>`;
+                button.textContent = 'Erro';
+            } finally {
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.disabled = false;
+                }, 2000);
+            }
+        }
+
+        function loadDashboard(category) {
+            const dashboard = document.getElementById('dashboard');
+
+            if (!sheetData[category]) {
+                dashboard.innerHTML = `
+                    <div class="loading">
+                        <h3>Sem dados carregados para ${getCategoryName(category)}</h3>
+                        <p>Clique em "Carregar Dados"</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Destrói gráficos anteriores
+            currentCharts.forEach(chart => chart.destroy());
+            currentCharts = [];
+            dashboard.innerHTML = '';
+
+            const categoryData = sheetData[category];
+            kpiCardsManager.renderKpiCards(categoryData);
+
+            const configs = chartConfigs[category] || [];
+
+            configs.forEach((config, index) => {
+                const chartContainer = document.createElement('div');
+                chartContainer.className = 'chart-container';
+
+                chartContainer.innerHTML = `
+                    <div class="chart-header">
+                        <h3 class="chart-title">${config.title}</h3>
+                        <div class="chart-controls">
+                            <button class="download-btn" onclick="downloadChart('chart-${category}-${index}')">📥 PNG</button>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="chart-${category}-${index}"></canvas>
+                    </div>
+                `;
+
+                dashboard.appendChild(chartContainer);
+
+                const chartData = prepareChartData(categoryData, config.dataKey);
+
+                const ctx = document.getElementById(`chart-${category}-${index}`).getContext('2d');
+                const chart = new Chart(ctx, {
+                    type: config.type,
+                    data: {
+                        labels: chartData.labels,
+                        datasets: [{
+                            label: config.title,
+                            data: chartData.values,
+                            borderColor: getColorByIndex(index),
+                            backgroundColor: config.type === 'bar' ? getColorByIndex(index, 0.7) : getColorByIndex(index, 0.1),
+                            borderWidth: 2,
+                            fill: config.type === 'line',
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: { color: getComputedStyle(document.documentElement).getPropertyValue('--text-primary') }
+                            },
+                        },
+                        scales: {
+                            x: {
+                                grid: { color: getComputedStyle(document.documentElement).getPropertyValue('--border-color') },
+                                ticks: { color: getComputedStyle(document.documentElement).getPropertyValue('--text-primary') }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: getComputedStyle(document.documentElement).getPropertyValue('--border-color') },
+                                ticks: { color: getComputedStyle(document.documentElement).getPropertyValue('--text-primary') }
+                            }
+                        }
+                    }
+                });
+                currentCharts.push(chart);
+            });
+        }
+
+        function prepareChartData(data, dataKey) {
+            const labels = [];
+            const values = [];
+
+            data.forEach(row => {
+                // Tenta encontrar o valor usando a chave exata
+                let val = row[dataKey];
+
+                // Se o backend retorna tudo em lowercase, mas configs tem erro, tenta normalizar
+                if (val === undefined) {
+                    // console.warn(`Chave ${dataKey} não encontrada na linha`, row);
+                    val = 0;
+                }
+
+                labels.push(row.mes || row.date || row.data || 'Periodo');
+                values.push(parseFloat(val) || 0);
+            });
+
+            return { labels, values };
+        }
+
+        function getColorByIndex(index, alpha = 1) {
+            const colors = [
+                `rgba(54, 162, 235, ${alpha})`,
+                `rgba(255, 99, 132, ${alpha})`,
+                `rgba(75, 192, 192, ${alpha})`,
+                `rgba(255, 159, 64, ${alpha})`,
+                `rgba(153, 102, 255, ${alpha})`
+            ];
+            return colors[index % colors.length];
+        }
+
+        function downloadChart(chartId) {
+            const canvas = document.getElementById(chartId);
+            if (canvas) {
+                const link = document.createElement('a');
+                link.download = `${chartId}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            }
+        }
+
+        // Inicialização de botões de download globais
+        document.getElementById('download-png').addEventListener('click', function () {
+            currentCharts.forEach((chart, index) => {
+                setTimeout(() => {
+                    const link = document.createElement('a');
+                    link.download = `grafico-${index}.png`;
+                    link.href = chart.canvas.toDataURL('image/png');
+                    link.click();
+                }, index * 200);
+            });
+        });
+    </script>
 </body>
 
 </html>
