@@ -62,6 +62,7 @@ function initializeApp() {
     // 4. Verificar conexão
     checkConnection();
     setupNetworkListeners();
+    setupEventListeners();
 
     // 5. Verificar autenticação
     checkAuthentication();
@@ -105,10 +106,32 @@ function mapDOMElements() {
         dashboardContainer: document.getElementById('dashboard-container'),
         dashboardFooter: document.getElementById('dashboard-footer'),
         mainDashboard: document.getElementById('main-dashboard'),
-        loadingSkeleton: document.getElementById('loading-skeleton')
+        loadingSkeleton: document.getElementById('loading-skeleton'),
+        loadDataBtn: document.getElementById('load-data')
     };
 
     console.log('✅ Elementos do DOM mapeados');
+}
+
+/**
+ * Configura listeners de eventos globais
+ */
+function setupEventListeners() {
+    if (DOM.loadDataBtn) {
+        DOM.loadDataBtn.addEventListener('click', async () => {
+            const originalText = DOM.loadDataBtn.textContent;
+            DOM.loadDataBtn.textContent = 'Carregando...';
+            DOM.loadDataBtn.disabled = true;
+
+            await refreshData();
+
+            DOM.loadDataBtn.textContent = 'Dados Atualizados!';
+            setTimeout(() => {
+                DOM.loadDataBtn.textContent = originalText;
+                DOM.loadDataBtn.disabled = false;
+            }, 2000);
+        });
+    }
 }
 
 /**
@@ -1025,22 +1048,10 @@ function getKPIDescription(metric) {
  * Obtém configurações de gráfico para categoria
  */
 function getChartConfigsForCategory(category) {
-    const configs = {
-        'email': [
-            { title: 'Taxa de Abertura', type: 'line', dataKey: 'taxa_abertura', id: 'email-open-rate' },
-            { title: 'Taxa de Cliques', type: 'line', dataKey: 'taxa_cliques', id: 'email-click-rate' },
-            { title: 'Taxa de Conversão', type: 'bar', dataKey: 'taxa_conversao', id: 'email-conversion-rate' },
-            { title: 'Taxa de Rejeição', type: 'line', dataKey: 'taxa_rejeicao', id: 'email-bounce-rate' }
-        ],
-        'social': [
-            { title: 'Engajamento', type: 'line', dataKey: 'engajamento', id: 'social-engagement' },
-            { title: 'Alcance', type: 'bar', dataKey: 'alcance', id: 'social-reach' },
-            { title: 'Seguidores', type: 'line', dataKey: 'seguidores', id: 'social-followers' },
-            { title: 'Taxa ROAS', type: 'bar', dataKey: 'taxa_roas', id: 'social-roas' }
-        ]
-    };
-
-    return configs[category] || [];
+    if (window.CHART_CONFIGS && window.CHART_CONFIGS[category]) {
+        return window.CHART_CONFIGS[category];
+    }
+    return [];
 }
 
 /**
